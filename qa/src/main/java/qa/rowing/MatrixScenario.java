@@ -2,7 +2,7 @@ package qa.rowing;
 
 import net.minecraft.client.*;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.client.resources.PlayerSkin;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.*;
@@ -13,7 +13,9 @@ import java.nio.file.*;
 import com.google.gson.GsonBuilder;
 
 public final class MatrixScenario {
-    public record Case(String type,PlayerSkin.Model skin,HumanoidArm hand,CameraType view,int fov,boolean armor) {
+    public enum SkinModel { WIDE,SLIM }
+    public record NativeSkin(ResourceLocation texture,SkinModel model) {}
+    public record Case(String type,SkinModel skin,HumanoidArm hand,CameraType view,int fov,boolean armor) {
         public String label() { return type+"/"+skin+"/"+hand+"/"+view+"/"+fov+"/"+armor; }
     }
     private static final List<Case> CASES=new ArrayList<>();
@@ -23,21 +25,21 @@ public final class MatrixScenario {
     private static boolean done;
     static {
         for(String wood:List.of("oak","spruce","birch","jungle","acacia","dark_oak","mangrove","cherry"))
-            for(String type:List.of(wood+"_boat",wood+"_chest_boat")) CASES.add(new Case(type,PlayerSkin.Model.WIDE,HumanoidArm.RIGHT,CameraType.THIRD_PERSON_FRONT,70,false));
-        CASES.add(new Case("bamboo_raft",PlayerSkin.Model.WIDE,HumanoidArm.RIGHT,CameraType.THIRD_PERSON_FRONT,70,false));
-        CASES.add(new Case("bamboo_chest_raft",PlayerSkin.Model.WIDE,HumanoidArm.RIGHT,CameraType.THIRD_PERSON_FRONT,70,false));
+            for(String type:List.of(wood+"_boat",wood+"_chest_boat")) CASES.add(new Case(type,SkinModel.WIDE,HumanoidArm.RIGHT,CameraType.THIRD_PERSON_FRONT,70,false));
+        CASES.add(new Case("bamboo_raft",SkinModel.WIDE,HumanoidArm.RIGHT,CameraType.THIRD_PERSON_FRONT,70,false));
+        CASES.add(new Case("bamboo_chest_raft",SkinModel.WIDE,HumanoidArm.RIGHT,CameraType.THIRD_PERSON_FRONT,70,false));
         for(String type:List.of("oak_boat","oak_chest_boat","bamboo_raft","bamboo_chest_raft"))
-            for(var skin:PlayerSkin.Model.values()) for(var hand:HumanoidArm.values()) for(var view:CameraType.values())
+            for(var skin:SkinModel.values()) for(var hand:HumanoidArm.values()) for(var view:CameraType.values())
                 CASES.add(new Case(type,skin,hand,view,view==CameraType.FIRST_PERSON?110:view==CameraType.THIRD_PERSON_BACK?30:70,true));
-        for(String type:List.of("oak_boat","bamboo_raft")) for(var skin:PlayerSkin.Model.values())
+        for(String type:List.of("oak_boat","bamboo_raft")) for(var skin:SkinModel.values())
             for(var hand:HumanoidArm.values()) CASES.add(new Case(type,skin,hand,CameraType.FIRST_PERSON,30,false));
     }
     public static String current() { return current; }
-    public static PlayerSkin skin() {
+    public static NativeSkin skin() {
         if(index<0) return null;
         var target=CASES.get(index).skin;
         for(int seed=0;seed<256;seed++) {
-            var candidate=DefaultPlayerSkin.get(new UUID(seed,seed*31L));
+            var id=new UUID(seed,seed*31L); var candidate=new NativeSkin(DefaultPlayerSkin.getDefaultSkin(id),DefaultPlayerSkin.getSkinModelName(id).equals("slim")?SkinModel.SLIM:SkinModel.WIDE);
             if(candidate.model()==target) return candidate;
         }
         throw new IllegalStateException("No native skin for "+target);
@@ -79,7 +81,7 @@ public final class MatrixScenario {
             boat.setVariant(Boat.Type.byName(wood));
             boat.setPos(0,-58.1,0);server.overworld().addFreshEntity(boat);player.startRiding(boat,true);expectedBoat=boat.getUUID();
             server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),test.armor
-                    ? "item replace entity RowQA armor.chest with minecraft:diamond_chestplate[minecraft:enchantments={\"minecraft:protection\":1},minecraft:trim={pattern:\"minecraft:spire\",material:\"minecraft:gold\"}]"
+                    ? "item replace entity RowQA armor.chest with minecraft:diamond_chestplate{Enchantments:[{id:\"minecraft:protection\",lvl:1s}],Trim:{pattern:\"minecraft:spire\",material:\"minecraft:gold\"}}"
                     : "item replace entity RowQA armor.chest with minecraft:air");
         });
     }

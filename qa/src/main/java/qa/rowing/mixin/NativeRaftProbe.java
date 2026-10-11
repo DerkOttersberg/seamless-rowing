@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class NativeRaftProbe {
     @Shadow @Final private ModelPart leftPaddle;
     @Shadow @Final private ModelPart rightPaddle;
-    @Inject(method="setupAnim(Lnet/minecraft/world/entity/vehicle/Boat;FFFFF)V",at=@At("RETURN"),order=1200)
+    @Inject(method="setupAnim(Lnet/minecraft/world/entity/vehicle/Boat;FFFFF)V",at=@At("RETURN"))
     private void paddles(Boat boat,float partial,float speed,float age,float yaw,float pitch,CallbackInfo ci){
         var mc=net.minecraft.client.Minecraft.getInstance();
         var row=boat.getControllingPassenger() instanceof AbstractClientPlayer p

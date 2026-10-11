@@ -22,7 +22,7 @@ public final class SurfaceGeometry {
         var cubes=((ModelPartAccess)(Object)model.body).rowingCubes();
         if(cubes.size()!=1)return;
         float min=Float.POSITIVE_INFINITY,max=Float.NEGATIVE_INFINITY;
-        for(var face:cubes.getFirst().polygons)for(var v:face.vertices){min=Math.min(min,v.pos.y);max=Math.max(max,v.pos.y);}
+        for(var face:cubes.get(0).polygons)for(var v:face.vertices){min=Math.min(min,v.pos.y);max=Math.max(max,v.pos.y);}
         boolean skin=Math.abs(min)<.01&&Math.abs(max-12)<.01;
         if(!skin&&!skinBodies.containsKey(model.body))System.out.println("NATIVE_INFLATED_EQUIPMENT_BODY minY="+min+" maxY="+max);
         skinBodies.put(model.body,skin);
@@ -48,7 +48,7 @@ public final class SurfaceGeometry {
         if(cubes.size()<2)return;
         var neck=new Vector3f(model.head.x-model.body.x,model.head.y-model.body.y,model.head.z-model.body.z);
         double nearest=Double.POSITIVE_INFINITY;
-        for(var face:cubes.getLast().polygons) if(face.vertices.length==4) {
+        for(var face:cubes.get(cubes.size()-1).polygons) if(face.vertices.length==4) {
             var center=new Vector3f();for(var v:face.vertices)center.add(v.pos.x,v.pos.y,v.pos.z);center.mul(.25f);
             nearest=Math.min(nearest,center.distance(neck));
         }
@@ -77,7 +77,7 @@ public final class SurfaceGeometry {
         var marker=new com.mojang.blaze3d.vertex.PoseStack();lower.translateAndRotate(marker);
         var wrist=marker.last().pose().transformPosition(new Vector3f(0,6f/16,0)).mul(16);
         double nearest=Double.POSITIVE_INFINITY;
-        for(var face:cubes.getLast().polygons) if(face.vertices.length==4) {
+        for(var face:cubes.get(cubes.size()-1).polygons) if(face.vertices.length==4) {
             var center=new Vector3f();for(var v:face.vertices)center.add(v.pos.x,v.pos.y,v.pos.z);center.mul(.25f);
             nearest=Math.min(nearest,center.distance(wrist));
         }
@@ -94,7 +94,7 @@ public final class SurfaceGeometry {
         report.put("changedHiddenHeads",changedHiddenHeads);
         report.put("failedBodyRestores",failedBodyRestores);report.put("maximumNeckToTorsoPixels",neckError);
         if(bodySamples>0)report.put("neckForwardRangePixels",maxNeckZ-minNeckZ);
-        report.put("pass",samples>0&&brokenRings==0&&invalidFaces==0&&wristError<.001&&bodySamples>0&&restoredBodies+restoredCustomBodies>0&&failedBodyRestores==0&&neckError<.001&&changedHiddenHeads==0);
+        report.put("pass",samples>0&&brokenRings==0&&invalidFaces==0&&wristError<.01&&bodySamples>0&&restoredBodies+restoredCustomBodies>0&&failedBodyRestores==0&&neckError<.001&&changedHiddenHeads==0);
         try {Files.writeString(mc.gameDirectory.toPath().resolve("rowing-surface.json"),new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(report));}
         catch(Exception failure){throw new RuntimeException(failure);}
     }

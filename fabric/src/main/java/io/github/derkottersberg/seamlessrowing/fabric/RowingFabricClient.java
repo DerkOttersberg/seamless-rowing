@@ -29,7 +29,7 @@ public final class RowingFabricClient implements ClientModInitializer {
     private static final class Reload extends net.minecraft.server.packs.resources.SimplePreparableReloadListener<float[]>
             implements net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener {
         private final Services services;Reload(Services services){this.services=services;}
-        public ResourceLocation getFabricId(){return ResourceLocation.fromNamespaceAndPath("seamlessrowing","pose_clip");}
+        public ResourceLocation getFabricId(){return new ResourceLocation("seamlessrowing","pose_clip");}
         protected float[] prepare(net.minecraft.server.packs.resources.ResourceManager resources,net.minecraft.util.profiling.ProfilerFiller profiler){return io.github.derkottersberg.seamlessrowing.client.StrokeProfile.prepare(resources);}
         protected void apply(float[] clip,net.minecraft.server.packs.resources.ResourceManager resources,net.minecraft.util.profiling.ProfilerFiller profiler){io.github.derkottersberg.seamlessrowing.client.StrokeProfile.apply(clip);RowingClient.clear();services.resourcesReloaded(resources);}
     }

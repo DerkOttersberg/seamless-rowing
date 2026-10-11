@@ -12,6 +12,14 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemInHandRenderer.class)
 public class HandsRendererMixin {
+    // Whole-pass redirects can bypass renderArmWithItem. Claim the enclosing
+    // pass only while rowing owns it; direct actions retain their renderer.
+    @Inject(method="renderHandsWithItems",at=@At("HEAD"),cancellable=true)
+    private void rowing$handsPass(float partial,PoseStack stack,MultiBufferSource.BufferSource buffers,
+            net.minecraft.client.player.LocalPlayer player,int light,CallbackInfo ci){
+        var row=RowingClient.capture(player,partial,true);
+        if(row!=null && ((row.ownLeft()&&row.ownRight()) || RowingClient.groupedFirstPersonHands()))ci.cancel();
+    }
     @Inject(method="renderArmWithItem",at=@At("HEAD"),cancellable=true)
     private void stow(AbstractClientPlayer player,float partial,float pitch,InteractionHand hand,float swing,ItemStack item,float height,PoseStack stack,MultiBufferSource buffers,int light,CallbackInfo ci){
         var row=RowingClient.capture(player,partial,true);

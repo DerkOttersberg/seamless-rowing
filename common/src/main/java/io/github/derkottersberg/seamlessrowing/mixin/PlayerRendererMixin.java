@@ -15,11 +15,11 @@ public class PlayerRendererMixin {
     @Inject(method="<init>",at=@At("RETURN"))
     private void layer(CallbackInfo ci){((LivingRendererAccess)this).rowingAddLayer(new RowingArmLayer((RenderLayerParent)this));}
     @Inject(method="render(Lnet/minecraft/client/player/AbstractClientPlayer;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",at=@At("HEAD"))
-    private void begin(AbstractClientPlayer player,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light,CallbackInfo ci){RenderContext.begin(player,partial,new Matrix4f(stack.last().pose()));}
+    private void begin(AbstractClientPlayer player,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light,CallbackInfo ci){RenderContext.begin(player,partial,new Matrix4f(stack.last().pose())); ((AnimationOwnership)(Object)((PlayerRenderer)(Object)this).getModel()).rowingRestorePose();}
     @Inject(method="render(Lnet/minecraft/client/player/AbstractClientPlayer;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",at=@At("RETURN"))
     private void end(AbstractClientPlayer player,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light,CallbackInfo ci){RenderContext.end();}
-    @ModifyVariable(method="setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFFF)V",at=@At("HEAD"),argsOnly=true,ordinal=1)
-    private float bodyYaw(float yaw,AbstractClientPlayer player,PoseStack stack,float age,float originalYaw,float partial,float scale){
+    @ModifyVariable(method="setupRotations(Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;FFF)V",at=@At("HEAD"),argsOnly=true,ordinal=1)
+    private float bodyYaw(float yaw,AbstractClientPlayer player,PoseStack stack,float age,float originalYaw,float partial){
         var context=RenderContext.current();
         if(context==null||context.rowingPose()==null||!(player.getVehicle() instanceof net.minecraft.world.entity.vehicle.Boat boat))return yaw;
         float weight=Math.max(context.rowingPose().leftWeight(),context.rowingPose().rightWeight());

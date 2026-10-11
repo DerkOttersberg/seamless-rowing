@@ -10,13 +10,12 @@ dependencies {
     modImplementation libs.fabric.loader
     modImplementation libs.fabric.api
     modCompileOnly libs.modmenu
-    modCompileOnly('maven.modrinth:entity-model-features:VeoAKvQ0') { transitive=false }
-    modCompileOnly('maven.modrinth:entitytexturefeatures:OVZ7HJXt') { transitive=false }
-    modCompileOnly('maven.modrinth:first-person-model:UowdyPMu') { transitive=false }
-    modCompileOnly('maven.modrinth:not-enough-animations:P5COwDnM') { transitive=false }
-    modCompileOnly('maven.modrinth:real-camera:ERGbfBFO') { transitive=false }
-    modCompileOnly('maven.modrinth:player-animation-library:tDcfU8FO') { transitive=false }
-    modCompileOnly('maven.modrinth:playeranimator:CkedfDp3') { transitive=false }
+    modCompileOnly('maven.modrinth:entity-model-features:rQLv8RBX') { transitive=false }
+    modCompileOnly('maven.modrinth:entitytexturefeatures:XtfsASE0') { transitive=false }
+    modCompileOnly('maven.modrinth:first-person-model:vSfLd8fO') { transitive=false }
+    modCompileOnly('maven.modrinth:not-enough-animations:RzJ39lca') { transitive=false }
+    modCompileOnly('maven.modrinth:real-camera:GtVt9wyh') { transitive=false }
+    modCompileOnly('maven.modrinth:playeranimator:yDqYTUaf') { transitive=false }
 }
 loom {
     accessWidenerPath=rootProject.file('common/src/main/resources/seamlessrowing.accesswidener')
@@ -32,3 +31,6 @@ tasks.named('jar') {
 }
 tasks.named('remapJar') { archiveFileName="${rootProject.archives_base_name}-${project.version}-fabric.jar" }
 tasks.named('remapSourcesJar') { archiveFileName="${rootProject.archives_base_name}-${project.version}-fabric-sources.jar" }
+
+// Public, compile-only optional action API; its implementation remains in Throw Weapons.
+dependencies { compileOnly project(':optional-api-stubs') }

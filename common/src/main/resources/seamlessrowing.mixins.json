@@ -2,9 +2,10 @@
   "required": true,
   "minVersion": "0.8",
   "package": "io.github.derkottersberg.seamlessrowing.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "client": [
     "ModelPartAccess",
+    "SurfaceRenderMixin",
     "PolygonAccess",
     "LivingRendererAccess",
     "PlayerRendererMixin",
@@ -16,6 +17,7 @@
     "ArmorLayerMixin",
     "RaftModelMixin",
     "FirstPersonLayersMixin",
+    "FirstPersonBaseMixin",
     "FirstPersonNameMixin"
   ],
   "injectors": {
@@ -23,3 +25,4 @@
   },
   "refmap": "seamlessrowing.refmap.json"
 }
+

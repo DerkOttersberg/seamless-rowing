@@ -6,7 +6,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.ModList;
 @Mod("seamlessrowing_qa")
 public final class QaForge {
-    public QaForge(FMLJavaModLoadingContext context) {
+    public QaForge() {
         if(FMLEnvironment.dist.isClient()) {
             QaPlatform.initialize(ModList.get()::isLoaded);
             var program=new RowingQaClient();program.initialize();

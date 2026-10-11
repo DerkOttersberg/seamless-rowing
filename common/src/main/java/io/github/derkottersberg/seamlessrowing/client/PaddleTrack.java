@@ -29,7 +29,7 @@ public final class PaddleTrack {
         return fromLean+((active ? StrokeProfile.lean(phase) : 0)-fromLean)*t;
     }
     private static float ease(float value) {
-        float t=Math.clamp(value,0f,1f);
+        float t=Math.max(0f,Math.min(1f,value));
         return t*t*t*(t*(t*6-15)+10);
     }
 }

@@ -8,10 +8,10 @@ dependencies {
     minecraft libs.minecraft
     mappings loom.officialMojangMappings()
     forge libs.forge
-    modCompileOnly('maven.modrinth:entity-model-features:wOlTlh6B') { transitive=false }
-    modCompileOnly('maven.modrinth:entitytexturefeatures:44zU11wr') { transitive=false }
-    modCompileOnly('maven.modrinth:first-person-model:VOhG3rdX') { transitive=false }
-    modCompileOnly('maven.modrinth:not-enough-animations:IfXEGews') { transitive=false }
+    modCompileOnly('maven.modrinth:entity-model-features:6RQ5C1J6') { transitive=false }
+    modCompileOnly('maven.modrinth:entitytexturefeatures:VkWikkyj') { transitive=false }
+    modCompileOnly('maven.modrinth:first-person-model:kxFDUOmS') { transitive=false }
+    modCompileOnly('maven.modrinth:not-enough-animations:kGjMleOz') { transitive=false }
 }
 loom {
     accessWidenerPath=rootProject.file('common/src/main/resources/seamlessrowing.accesswidener')
@@ -31,7 +31,9 @@ tasks.named('remapSourcesJar') { archiveFileName="${rootProject.archives_base_na
 
 // Compile the shared optional API schemas; these dependencies are never installed or bundled on Forge.
 dependencies {
-    modCompileOnly('maven.modrinth:real-camera:j9j0EChP') { transitive=false }
-    modCompileOnly('maven.modrinth:player-animation-library:yjxtkvnD') { transitive=false }
-    modCompileOnly('maven.modrinth:playeranimator:HJZB6bmA') { transitive=false }
+    modCompileOnly('maven.modrinth:real-camera:zxrGLIlw') { transitive=false }
+    modCompileOnly('maven.modrinth:playeranimator:xe2EVE6q') { transitive=false }
 }
+
+// Public, compile-only optional action API; its implementation remains in Throw Weapons.
+dependencies { compileOnly project(':optional-api-stubs') }

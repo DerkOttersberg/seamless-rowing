@@ -44,10 +44,12 @@ public final class RowingClient {
                 &&mc.player.getVehicle() instanceof Boat boat&&eligible(mc.player,boat);
     }
     public static boolean restoresPaddles() {return platform.paddleVisibilityHandoff();}
+    public static boolean groupedFirstPersonHands() {return platform.groupedFirstPersonHands();}
     public static void prepareModel(net.minecraft.client.model.PlayerModel model) {platform.prepareRowingModel(model);}
     public static void save(ClientSettings draft) throws IOException { draft.save(configPath()); settings=draft; clear(); }
     public static void clear() { TRACKS.clear(); levelIdentity=null;RenderContext.clear(); }
     public static String compatibilityStatus() {
+        if(platform.customBoatGeometry())return "Custom boat resource geometry: existing boat and player rendering preserved.";
         if(platform.unsupportedAnimationIntegration()) return platform.integrationStatus();
         if (platform.isModLoaded("figura") || platform.isModLoaded("cpm") || platform.isModLoaded("epicfight"))
             return "Custom player rig detected: rowing visuals safely disabled.";
@@ -107,6 +109,7 @@ public final class RowingClient {
                 || !(player.getVehicle() instanceof Boat boat) || boat.getControllingPassenger()!=player
                 || geometry(boat)==null || platform.externalAnimationActive(player) || player.isUsingItem()) return false;
         boolean first=player==mc.player && mc.options.getCameraType().isFirstPerson();
+        if(first && platform.groupedFirstPersonHands() && player.swinging) return false;
         if(first ? !settings.firstPerson() || skinLayers() : !settings.thirdPerson()) return false;
         var track=TRACKS.get(boat.getUUID());
         return boat.getPaddleState(0) || boat.getPaddleState(1)
@@ -114,6 +117,7 @@ public final class RowingClient {
                 && (track.left.weight(1)>.001f || track.right.weight(1)>.001f);
     }
     public static RowingPose capture(AbstractClientPlayer player,float partial,boolean firstPerson) {
+        if(firstPerson && platform.groupedFirstPersonHands() && player.swinging) return null;
         if(firstPerson && Minecraft.getInstance().getCameraEntity()!=player) return null;
         if (!settings.enabled() || customRig() || !(player.getVehicle() instanceof Boat boat)
                 || !eligible(player,boat) || (firstPerson ? !settings.firstPerson() : !settings.thirdPerson())) return null;
@@ -143,6 +147,7 @@ public final class RowingClient {
         return true;
     }
     private static PaddleGeometry geometry(Boat boat) {
+        if(platform.customBoatGeometry())return null;
         var renderer=Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(boat);
         for(var adapter:GEOMETRY) if(adapter.matches(boat,renderer)) return adapter;
         return null;

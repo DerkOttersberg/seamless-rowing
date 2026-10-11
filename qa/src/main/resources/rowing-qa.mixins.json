@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "qa.rowing.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "client": [
     "ArmContactProbe",
     "FrameProbe",
@@ -15,10 +15,17 @@
     "SkinProbe",
     "PaddleSoundProbe",
     "ShutdownProbe",
-    "BodySurfaceProbe"
+    "SurfaceSubmissionProbe",
+    "FirstPersonBodyProbe",
+    "VanillaHandsProbe",
+    "BodySurfaceProbe",
+    "SubmittedBodyProbe",
+    "LocalHeadProbe"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "refmap": "rowing-qa.refmap.json"
 }
+
+

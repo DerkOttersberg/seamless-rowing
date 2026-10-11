@@ -10,6 +10,6 @@ public final class ShoulderReach {
         float excess=distance-11.5f;
         if(excess<=0)return new Vector3f(shoulder);
         float shift=excess<.6f?excess*excess/1.2f:excess-.3f;
-        return direction.mul(Math.min(1.5f,shift)*Math.clamp(weight,0,1)/distance).add(shoulder);
+        return direction.mul(Math.min(1.5f,shift)*Math.max(0,Math.min(1,weight))/distance).add(shoulder);
     }
 }

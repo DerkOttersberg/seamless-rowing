@@ -23,7 +23,7 @@ public final class RowingArmorModel extends HumanoidModel<AbstractClientPlayer> 
         var children=new HashMap<String,ModelPart>();((ModelPartAccess)(Object)source).rowingChildren().forEach((name,part)->children.put(name,copy(part)));
         return new ModelPart(((ModelPartAccess)(Object)source).rowingCubes(),children);
     }
-    @Override public void renderToBuffer(PoseStack stack,VertexConsumer consumer,int light,int overlay,int color){
+    @Override public void renderToBuffer(PoseStack stack,VertexConsumer consumer,int light,int overlay,float red,float green,float blue,float alpha){
         var context=RenderContext.current();
         if(context!=null&&context.rowingPose()!=null){
             var renderer=net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(context.player);
@@ -39,7 +39,7 @@ public final class RowingArmorModel extends HumanoidModel<AbstractClientPlayer> 
                 if(context.rowingHandsOnly()){head.visible=hat.visible=body.visible=leftLeg.visible=rightLeg.visible=false;}
             }
         }
-        super.renderToBuffer(stack,consumer,light,overlay,color);
+        for(var part:List.of(head,hat,body,leftArm,rightArm,leftLeg,rightLeg)) SurfaceRenderer.render(part,stack,consumer,light,overlay,red,green,blue,alpha);
     }
     private static ArmRigModel.Bone bone(ModelPart arm,RowingPose row,boolean left,Matrix4f transform,boolean hands) {
         if(row.owns(left))return RowingArmLayer.solve(arm,row,left,transform,false);
@@ -49,3 +49,4 @@ public final class RowingArmorModel extends HumanoidModel<AbstractClientPlayer> 
         return new ArmRigModel.Bone(shoulder,rotation,new org.joml.Quaternionf(),!hands,false);
     }
 }
+

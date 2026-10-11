@@ -1,1 +1,6 @@
-{"pack":{"pack_format":34,"description":"Seamless Rowing client resources"}}
+{
+  "pack": {
+    "pack_format": 15,
+    "description": "Seamless Rowing client resources"
+  }
+}

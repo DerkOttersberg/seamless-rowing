@@ -10,7 +10,7 @@ public final class ArmSolver {
         Point3 delta=target.subtract(shoulder);
         double distance=delta.length();
         Point3 direction=distance>1e-8 ? delta.scale(1/distance) : new Point3(0,1,0);
-        double reach=Math.clamp(distance, Math.abs(upper-lower)+1e-6, upper+lower-1e-6);
+        double reach=Math.max(Math.abs(upper-lower)+1e-6,Math.min(upper+lower-1e-6,distance));
         Point3 bend=pole.subtract(direction.scale(pole.dot(direction)));
         if (bend.length()<1e-6) {
             Point3 alternate=Math.abs(direction.x())<0.8 ? new Point3(1,0,0) : new Point3(0,0,1);

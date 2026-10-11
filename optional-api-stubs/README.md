@@ -1,0 +1,1 @@
+Only the public descriptors used by the optional Throw Weapons adapter are declared here. Verified against SwordThrowClient.poseStateFor(int) in the existing 2.1.0/2.1.1 version branches. These classes are compile-only and are forbidden in distribution JARs. They are not implementations or runtime dependencies.
