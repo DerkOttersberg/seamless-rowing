@@ -1,0 +1,84 @@
+plugins {
+    id 'base'
+    alias(libs.plugins.architectury)
+    alias(libs.plugins.loom) apply false
+}
+architectury { minecraft = libs.versions.minecraft.get() }
+allprojects {
+    group = rootProject.maven_group
+    version = rootProject.mod_version
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.terraformersmc.com/releases/' }
+        maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
+        ivy {
+            url = 'https://github.com/tr7zw'
+            patternLayout { artifact '[module]/releases/download/[revision]/[artifact]-[revision]-mc26.3.[ext]' }
+            metadataSources { artifact() }
+            content { includeGroup 'tr7zw' }
+        }
+        ivy {
+            url = 'https://github.com/PlayerAnimationLibrary'
+            patternLayout { artifact '[module]/releases/download/v[revision]+26.3/[artifact]-[revision]+mc.26.3.[ext]' }
+            metadataSources { artifact() }
+            content { includeGroup 'com.zigythebird' }
+        }
+    }
+}
+subprojects {
+    apply plugin: 'java-library'
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(libs.versions.java.get().toInteger())
+        withSourcesJar()
+    }
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = libs.versions.java.get().toInteger()
+    }
+    tasks.withType(Test).configureEach { useJUnitPlatform() }
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+}
+tasks.register('verifyCommonIsolation') {
+    inputs.files(fileTree('common/src/main') { include '**/*.java' })
+    doLast {
+        inputs.files.each { file ->
+            if (file.text =~ /(?:net\.fabricmc\.|net\.minecraftforge\.|net\.neoforged\.)/)
+                throw new GradleException("Loader import in common: ${file}")
+        }
+    }
+}
+tasks.register('verifyPreviewJar') {
+    dependsOn ':fabric:jar'
+    doLast {
+        def jar = project(':fabric').tasks.named('jar').get().archiveFile.get().asFile
+        new java.util.zip.ZipFile(jar).withCloseable { zip ->
+            ['fabric.mod.json', 'seamlessrowing.mixins.json', 'assets/seamlessrowing/icon.png',
+             'io/github/derkottersberg/seamlessrowing/client/RowingClient.class'].each {
+                if (!zip.getEntry(it)) throw new GradleException("Missing ${it}")
+            }
+            def metadata = new groovy.json.JsonSlurper().parseText(zip.getInputStream(zip.getEntry('fabric.mod.json')).getText('UTF-8'))
+            if (metadata.environment != 'client' || metadata.id != 'seamlessrowing' || metadata.depends.seamlessapi)
+                throw new GradleException('Incorrect client-only/standalone metadata')
+            if (zip.entries().any { it.name.startsWith('qa/') || it.name.contains('/qa/') || it.name.startsWith('com/derko/seamlessapi/') })
+                throw new GradleException('Test code or SeamlessLib packaged')
+        }
+    }
+}
+tasks.register('verifyAnimationAuthoring') {
+    inputs.files('animation-authoring/rowing.bbmodel','common/src/main/resources/assets/seamlessrowing/animations/fixed_seat.json')
+    doLast {
+        def json=new groovy.json.JsonSlurper()
+        def source=json.parse(file('animation-authoring/rowing.bbmodel'))
+        def clip=json.parse(file('common/src/main/resources/assets/seamlessrowing/animations/fixed_seat.json'))
+        def keys=source.animations[0].animators.values().first().keyframes
+        if(keys.size()!=9 || Math.abs(source.animations[0].length-clip.cycle_seconds)>0.00001) throw new GradleException('Authoring duration/key mismatch')
+        for(int i=0;i<8;i++) if(Math.abs(Math.toRadians(keys[i].data_points[0].x as double)-(clip.torso_pitch_radians[i] as double))>0.00001)
+            throw new GradleException('Authoring export differs from original keyframes')
+    }
+}
+tasks.named('check') { dependsOn 'verifyCommonIsolation', 'verifyPreviewJar', 'verifyAnimationAuthoring', ':common:check', ':fabric:check' }
+tasks.named('assemble') { dependsOn ':fabric:assemble' }

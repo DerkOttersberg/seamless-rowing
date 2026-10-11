@@ -1,0 +1,7 @@
+dependencies {
+    compileOnly project(':common')
+    compileOnly project(':fabric')
+    compileOnly libs.mixin
+}
+sourceSets.main.compileClasspath += project(':fabric').sourceSets.main.compileClasspath
+tasks.named('jar') { archiveFileName = 'seamless-rowing-qa.jar' }

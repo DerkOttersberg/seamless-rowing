@@ -1,0 +1,9 @@
+# Original fixed-seat poses
+
+Open `rowing.bbmodel` in Blockbench's free-model editor. The original torso clip contains eight Catmull–Rom keys and one repeated loop endpoint over 0.8 seconds. The neutral authoring mesh shows the seated torso, head and two six-pixel arm segments. It is reference geometry, not a replacement Minecraft model or bundled player texture.
+
+`common/src/main/resources/assets/seamlessrowing/animations/fixed_seat.json` is the runtime export in radians. `verifyAnimationAuthoring` compares every exported torso key with this source. Resource reload validates the clip and atomically replaces its snapshot. Invalid resource-pack clips fall back to these original poses.
+
+The runtime retimes this curve to each native paddle's synchronized phase. Shoulder rise and forward movement rotate around the seated hip; the legs keep their vanilla seated pose. Arms are solved from the rendered native paddle handle rather than replaying canned hand positions. Upper arm and forearm lengths are six model pixels. Original skin, sleeve and armor UVs are sliced at the elbow. First person hides proximal shoulder geometry that intersects the camera, without moving the elbow or handle.
+
+Technique was informed by the drive/recovery sequence in [World Rowing's basic technique reference](https://worldrowing.com/wp-content/uploads/2020/12/Level2Chapter3BasicRowingTechnique_English.pdf). Minecraft's fixed seat and short single-bladed paddles require restrained shoulder and torso motion; sliding-seat motion would disconnect the character from the boat. No external motion-capture clip or third-party animation asset is redistributed.

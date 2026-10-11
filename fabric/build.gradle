@@ -1,0 +1,31 @@
+plugins { id 'dev.architectury.loom-no-remap' }
+dependencies {
+    compileOnly 'maven.modrinth:entity-model-features:N7d5LddE'
+    compileOnly 'maven.modrinth:entitytexturefeatures:O8J3sxxp'
+    minecraft libs.minecraft
+    implementation libs.fabric.loader
+    implementation libs.fabric.api
+    compileOnly libs.modmenu
+    compileOnly('tr7zw:FirstPersonModel:2.7.3') { artifact { name = 'firstperson-fabric'; type = 'jar' } }
+    compileOnly('tr7zw:NotEnoughAnimations:1.12.5') { artifact { name = 'notenoughanimations-fabric'; type = 'jar' } }
+    compileOnly('com.zigythebird:PlayerAnimationLibrary:1.2.8') { artifact { name = 'PlayerAnimationLibMerged'; type = 'jar' } }
+    implementation project(':common')
+}
+loom {
+    mods { seamlessrowing { sourceSet sourceSets.main; sourceSet project(':common').sourceSets.main } }
+}
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand version: project.version }
+}
+tasks.named('jar') {
+    from project(':common').sourceSets.main.output
+    from(rootProject.file('LICENSE'))
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName = "${rootProject.archives_base_name}-${project.version}-fabric.jar"
+}
+tasks.named('sourcesJar') {
+    from project(':common').sourceSets.main.allSource
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName = "${rootProject.archives_base_name}-${project.version}-fabric-sources.jar"
+}

@@ -1,0 +1,1 @@
+{"required":true,"package":"qa.rowing.mixin","compatibilityLevel":"JAVA_25","client":["ArmContactProbe","FrameProbe","SubmittedArmProbe","NativePaddleProbe","SkinProbe","PaddleSoundProbe"],"injectors":{"defaultRequire":1}}

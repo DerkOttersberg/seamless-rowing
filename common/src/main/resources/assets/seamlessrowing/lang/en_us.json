@@ -1,0 +1,12 @@
+{
+  "key.category.seamlessrowing.controls": "Seamless Rowing",
+  "key.seamlessrowing.settings": "Open rowing settings",
+  "seamlessrowing.settings.title": "Seamless Rowing",
+  "seamlessrowing.settings.save": "Save",
+  "seamlessrowing.settings.scope": "Client visuals · Only affects your view",
+  "seamlessrowing.settings.enabled": "Rowing animation",
+  "seamlessrowing.settings.firstPerson": "First-person hands",
+  "seamlessrowing.settings.thirdPerson": "Third-person animation",
+  "seamlessrowing.settings.elbows": "Bent elbows",
+  "seamlessrowing.settings.torso": "Torso movement"
+}

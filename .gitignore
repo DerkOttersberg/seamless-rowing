@@ -1,0 +1,8 @@
+.gradle/
+**/build/
+**/run/
+qa-artifacts/
+*.log
+.idea/
+logs/
+release-preview/
