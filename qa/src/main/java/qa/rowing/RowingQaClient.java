@@ -1,7 +1,5 @@
 package qa.rowing;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.*;
@@ -11,19 +9,18 @@ import java.nio.file.*;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class RowingQaClient implements ClientModInitializer {
+public final class RowingQaClient {
     private final AtomicBoolean fixture=new AtomicBoolean();
     private int tick;
     private int missingVehicle;
     private static double maxError;
     private static int samples;
     public static void measure(double error) { maxError=Math.max(maxError,error); samples++; }
-    @Override public void onInitializeClient() {
+    public void initialize() {
         if(!System.getenv().getOrDefault("DISPLAY","").matches(":[1-9][0-9]*") || System.getenv("WAYLAND_DISPLAY")!=null)
             throw new IllegalStateException("QA requires an isolated nonzero X display");
-        ClientTickEvents.END_CLIENT_TICK.register(this::tick);
     }
-    private void tick(Minecraft mc) {
+    public void tick(Minecraft mc) {
         mc.options.pauseOnLostFocus=false;
         if(mc.player!=null&&!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if(System.getProperty("qa.rowing.scenario","").equals("settings")) { SettingsScenario.tick(mc);return; }
@@ -45,6 +42,7 @@ public final class RowingQaClient implements ClientModInitializer {
             boat.setPos(0,-58.1,0);level.addFreshEntity(boat);player.startRiding(boat,true,true);
             server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),"time set 6000");
         });
+        if(System.getProperty("qa.rowing.scenario","").equals("fresh")) {FreshScenario.tick(mc);return;}
         if(mc.player.getVehicle()==null) {
             if(++missingVehicle==60) {
                 System.out.println("ROWING_QA_FAILED missing vehicle position="+mc.player.position());mc.stop();

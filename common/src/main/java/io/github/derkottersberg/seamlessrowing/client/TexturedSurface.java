@@ -11,6 +11,7 @@ final class TexturedSurface {
     interface Warp { Vector3f point(float x,float y,float z); }
     private record Face(ModelPart.Cube cube,int index,ModelPart.Vertex[] rest,float winding,Vector3f normal) {}
     private final List<ModelPart.Cube> cubes=new ArrayList<>();
+    private final List<ModelPart.Cube> submittedCubes;
     private final List<Face> faces=new ArrayList<>();
     TexturedSurface(ModelPart source,float center,float yOffset,float step,float cutoff) {
         for(var original:((ModelPartAccess)(Object)source).rowingCubes()) {
@@ -36,6 +37,8 @@ final class TexturedSurface {
             }
         }
         deform((x,y,z)->new Vector3f(x,y,z));
+        // Keep the installed list's identity stable so restoration can recognize our mesh.
+        submittedCubes=List.copyOf(cubes);
     }
     private ModelPart.Cube emptyCube() {
         var cube=new ModelPart.Cube(0,0,-2,0,-2,4,12,4,0,0,0,false,64,64,EnumSet.allOf(Direction.class));
@@ -47,7 +50,7 @@ final class TexturedSurface {
         Vector3f cross=cross(rest);
         faces.add(new Face(cube,index,rest,cross.dot(polygon.normal())<0?-1:1,new Vector3f(polygon.normal())));
     }
-    List<ModelPart.Cube> cubes() { return List.copyOf(cubes); }
+    List<ModelPart.Cube> cubes() { return submittedCubes; }
     void deform(Warp warp) {
         for(var face:faces) {
             var vertices=Arrays.stream(face.rest).map(v->{var p=warp.point(v.x(),v.y(),v.z());return new ModelPart.Vertex(p.x,p.y,p.z,v.u(),v.v());}).toArray(ModelPart.Vertex[]::new);

@@ -1,0 +1,32 @@
+modLoader="javafml"
+loaderVersion="[66,)"
+license="All Rights Reserved"
+issueTrackerURL="https://github.com/DerkOttersberg/seamless-rowing/issues"
+clientSideOnly=true
+[[mods]]
+modId="seamlessrowing"
+version="${version}"
+displayName="Seamless Rowing"
+logoFile="assets/seamlessrowing/icon.png"
+displayURL="https://github.com/DerkOttersberg/seamless-rowing"
+authors="Derk Ottersberg"
+description='''Client-only articulated rowing arms and body motion, aligned with vanilla boat paddles. Servers need no installation.'''
+[[mixins]]
+config="seamlessrowing.mixins.json"
+[[mixins]]
+config="seamlessrowing.compat.mixins.json"
+
+[features.seamlessrowing]
+javaVersion="[25,)"
+[[dependencies.seamlessrowing]]
+modId="forge"
+mandatory=true
+versionRange="[66.0.9,67)"
+ordering="NONE"
+side="CLIENT"
+[[dependencies.seamlessrowing]]
+modId="minecraft"
+mandatory=true
+versionRange="[26.3]"
+ordering="NONE"
+side="CLIENT"

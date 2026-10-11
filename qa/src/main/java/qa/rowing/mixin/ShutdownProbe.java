@@ -11,5 +11,7 @@ public class ShutdownProbe {
     private void anatomy(CallbackInfo ci) {
         qa.rowing.ArmAnatomy.write((Minecraft)(Object)this);
         qa.rowing.SurfaceGeometry.write((Minecraft)(Object)this);
+        if(qa.rowing.QaPlatform.isModLoaded("entity_model_features"))
+            qa.rowing.FreshProbe.write((Minecraft)(Object)this);
     }
 }

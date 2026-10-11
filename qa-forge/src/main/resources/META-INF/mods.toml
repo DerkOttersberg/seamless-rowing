@@ -1,0 +1,10 @@
+modLoader="javafml"
+loaderVersion="[66,)"
+license="All Rights Reserved"
+clientSideOnly=true
+[[mods]]
+modId="seamlessrowing_qa"
+version="1"
+displayName="Isolated Rowing QA"
+[[mixins]]
+config="rowing-qa.mixins.json"

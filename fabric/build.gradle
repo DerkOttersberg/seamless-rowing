@@ -1,5 +1,7 @@
 plugins { id 'dev.architectury.loom-no-remap' }
+sourceSets.main.java.srcDir rootProject.file('loader-adapters/src/main/java')
 dependencies {
+    compileOnly 'maven.modrinth:real-camera:ROhlZqcT'
     compileOnly 'maven.modrinth:entity-model-features:N7d5LddE'
     compileOnly 'maven.modrinth:entitytexturefeatures:O8J3sxxp'
     minecraft libs.minecraft

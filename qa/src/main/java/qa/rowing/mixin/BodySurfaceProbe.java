@@ -16,5 +16,7 @@ public class BodySurfaceProbe {
     @Inject(method="setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V",at=@At("RETURN"),order=1200)
     private void geometry(AvatarRenderState state,CallbackInfo ci) {
         qa.rowing.SurfaceGeometry.body((PlayerModel)(Object)this,((RowingState)state).rowingPose());
+        if(qa.rowing.QaPlatform.isModLoaded("entity_model_features"))
+            qa.rowing.FreshProbe.inspect((PlayerModel)(Object)this,state);
     }
 }

@@ -20,7 +20,10 @@ public final class TorsoSurface {
     }
     public static void restore(ModelPart part) {
         var binding=BINDINGS.get(part);
-        if(binding!=null) ((ModelPartAccess)(Object)part).rowingCubes(binding.original);
+        var access=(ModelPartAccess)(Object)part;
+        // A custom-model adapter may have selected another mesh since our last draw.
+        // Restore only the mesh we installed; never insert vanilla cubes into that variant.
+        if(binding!=null&&access.rowingCubes()==binding.surface.cubes())access.rowingCubes(binding.original);
         ((ModelPartAccess)(Object)part).rowingChildren().values().forEach(TorsoSurface::restore);
     }
     public static void apply(ModelPart part,float lean,float twist) {

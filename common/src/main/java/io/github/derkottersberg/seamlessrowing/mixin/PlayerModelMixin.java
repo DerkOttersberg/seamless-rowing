@@ -20,6 +20,7 @@ public class PlayerModelMixin implements AnimationOwnership {
     // Restore before other animation adapters read the model; compose after their RETURN hooks.
     @Inject(method="setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V",at=@At("HEAD"),order=900)
     private void rowing$restore(AvatarRenderState state,CallbackInfo ci) {
+        if(((RowingState)state).rowingPose()!=null)RowingClient.prepareModel((PlayerModel)(Object)this);
         TorsoSurface.restore(((PlayerModel)(Object)this).body);
         rowing$hidden.forEach((part,visible)->part.visible=visible);
         rowing$hidden.clear();
@@ -36,6 +37,9 @@ public class PlayerModelMixin implements AnimationOwnership {
             carrier.rowingPose(row);
         }
         PlayerModel m=(PlayerModel)(Object)this;
+        if(!TorsoSurface.supported(m.body)||!ArmMesh.supported(m.leftArm)||!ArmMesh.supported(m.rightArm)) {
+            carrier.rowingPose(null);return;
+        }
         TorsoSurface.apply(m.body,row.lean(),row.twist());
         // FirstPersonModel may deliberately move the head thousands of pixels away to hide it.
         // Preserve that decision; a periodic spine curve must never wrap a hidden head back in view.

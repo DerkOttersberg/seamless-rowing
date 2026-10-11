@@ -36,6 +36,15 @@ public final class RowingClient {
     public static Path configPath() { return platform.configDirectory().resolve("seamless-rowing.json"); }
     public static ClientSettings settings() { return settings; }
     public static boolean scheduledOwnership() { return platform.animationSchedulerActive(); }
+    public static boolean managesFirstPersonBoat() {
+        if(platform==null)return false;
+        var mc=Minecraft.getInstance();
+        return mc!=null&&mc.player!=null&&settings.enabled()&&settings.firstPerson()&&!customRig()&&!skinLayers()
+                &&mc.options.getCameraType().isFirstPerson()&&mc.getCameraEntity()==mc.player
+                &&mc.player.getVehicle() instanceof AbstractBoat boat&&eligible(mc.player,boat);
+    }
+    public static boolean restoresPaddles() {return platform.paddleVisibilityHandoff();}
+    public static void prepareModel(net.minecraft.client.model.player.PlayerModel model) {platform.prepareRowingModel(model);}
     public static void save(ClientSettings draft) throws IOException { draft.save(configPath()); settings=draft; clear(); }
     public static void clear() { TRACKS.clear(); levelIdentity=null; }
     public static String compatibilityStatus() {
@@ -76,8 +85,7 @@ public final class RowingClient {
         if(!(avatarRenderer instanceof AvatarRenderer<?> avatar)
                 || avatar.getModel().getClass()!=net.minecraft.client.model.player.PlayerModel.class
                 || platform.customPlayerModel(avatar.getModel())
-                || !TorsoSurface.supported(avatar.getModel().body)
-                || !ArmMesh.supported(avatar.getModel().leftArm) || !ArmMesh.supported(avatar.getModel().rightArm)) return false;
+                || !platform.playerGeometrySupported(avatar.getModel())) return false;
         // A replacement renderer needs a verified geometry adapter, even if its entity subclasses a boat.
         var geometry=geometry(boat);
         if(platform.externalAnimationActive(player)) return false;
@@ -94,6 +102,19 @@ public final class RowingClient {
         }
         return true;
     }
+    /** Model-independent admission for EMF's per-entity vanilla-pose condition. */
+    public static boolean requestsRowingRig(AbstractClientPlayer player) {
+        var mc=Minecraft.getInstance();
+        if(!settings.enabled() || customRig() || !player.isAlive() || player.isSleeping() || player.isSpectator()
+                || !(player.getVehicle() instanceof AbstractBoat boat) || boat.getControllingPassenger()!=player
+                || geometry(boat)==null || platform.externalAnimationActive(player) || player.isUsingItem()) return false;
+        boolean first=player==mc.player && mc.options.getCameraType().isFirstPerson();
+        if(first ? !settings.firstPerson() || skinLayers() : !settings.thirdPerson()) return false;
+        var track=TRACKS.get(boat.getUUID());
+        return boat.getPaddleState(0) || boat.getPaddleState(1)
+                || track!=null && track.driver.equals(player.getUUID())
+                && (track.left.weight(1)>.001f || track.right.weight(1)>.001f);
+    }
     public static RowingPose capture(AbstractClientPlayer player,float partial,boolean firstPerson) {
         if(firstPerson && Minecraft.getInstance().getCameraEntity()!=player) return null;
         if (!settings.enabled() || customRig() || !(player.getVehicle() instanceof AbstractBoat boat)
@@ -106,6 +127,7 @@ public final class RowingClient {
         PaddlePose l=track.left.sample(boat.getRowingTime(0,partial),partial);
         PaddlePose r=track.right.sample(boat.getRowingTime(1,partial),partial);
         boolean ol=lw>.001f && owns(player,true),or=rw>.001f && owns(player,false);
+        if(!ol&&!or)return null;
         PaddleGeometry geometry=geometry(boat);
         if(geometry==null) return null;
         Vec3 relative=boat.getPosition(partial).subtract(player.getPosition(partial));

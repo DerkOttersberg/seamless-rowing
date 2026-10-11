@@ -10,6 +10,9 @@ allprojects {
     repositories {
         mavenCentral()
         maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://maven.neoforged.net/releases/' }
         maven { url = 'https://maven.terraformersmc.com/releases/' }
         maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
         ivy {
@@ -52,19 +55,38 @@ tasks.register('verifyCommonIsolation') {
     }
 }
 tasks.register('verifyPreviewJar') {
-    dependsOn ':fabric:jar'
+    dependsOn ':fabric:jar', ':forge:jar', ':neoforge:jar'
     doLast {
-        def jar = project(':fabric').tasks.named('jar').get().archiveFile.get().asFile
+        ['fabric','forge','neoforge'].each { loader ->
+        def jar = project(":"+loader).tasks.named('jar').get().archiveFile.get().asFile
         new java.util.zip.ZipFile(jar).withCloseable { zip ->
-            ['fabric.mod.json', 'seamlessrowing.mixins.json', 'assets/seamlessrowing/icon.png',
+            def metadataPath=loader=='fabric'?'fabric.mod.json':loader=='forge'?'META-INF/mods.toml':'META-INF/neoforge.mods.toml'
+            [metadataPath, 'seamlessrowing.mixins.json', 'seamlessrowing.compat.mixins.json', 'assets/seamlessrowing/icon.png',
              'io/github/derkottersberg/seamlessrowing/client/RowingClient.class'].each {
                 if (!zip.getEntry(it)) throw new GradleException("Missing ${it}")
             }
+            ['fabric.mod.json','META-INF/mods.toml','META-INF/neoforge.mods.toml'].findAll { it!=metadataPath }.each {
+                if(zip.getEntry(it))throw new GradleException("Other loader metadata in ${loader}: ${it}")
+            }
+            if(loader=='fabric') {
             def metadata = new groovy.json.JsonSlurper().parseText(zip.getInputStream(zip.getEntry('fabric.mod.json')).getText('UTF-8'))
-            if (metadata.environment != 'client' || metadata.id != 'seamlessrowing' || metadata.depends.seamlessapi)
+            if (metadata.environment != 'client' || metadata.id != 'seamlessrowing' || metadata.depends.seamlessapi || metadata.depends.minecraft!=libs.versions.minecraft.get())
                 throw new GradleException('Incorrect client-only/standalone metadata')
+            } else {
+                def metadata=zip.getInputStream(zip.getEntry(metadataPath)).getText('UTF-8')
+                if(!metadata.contains('versionRange="['+libs.versions.minecraft.get()+']"')||metadata.contains('seamlessapi'))
+                    throw new GradleException('Incorrect Minecraft/standalone metadata')
+            }
             if (zip.entries().any { it.name.startsWith('qa/') || it.name.contains('/qa/') || it.name.startsWith('com/derko/seamlessapi/') })
                 throw new GradleException('Test code or SeamlessLib packaged')
+            zip.entries().findAll { it.name.endsWith('.class') }.each {
+                def header=new java.io.DataInputStream(zip.getInputStream(it))
+                header.readInt();header.readUnsignedShort()
+                if(header.readUnsignedShort()>libs.versions.java.get().toInteger()+44)
+                    throw new GradleException("Incorrect Java bytecode: ${it.name}")
+                header.close()
+            }
+        }
         }
     }
 }
@@ -82,3 +104,5 @@ tasks.register('verifyAnimationAuthoring') {
 }
 tasks.named('check') { dependsOn 'verifyCommonIsolation', 'verifyPreviewJar', 'verifyAnimationAuthoring', ':common:check', ':fabric:check' }
 tasks.named('assemble') { dependsOn ':fabric:assemble' }
+tasks.named('check') { dependsOn ':forge:check', ':neoforge:check' }
+tasks.named('assemble') { dependsOn ':forge:assemble', ':neoforge:assemble' }

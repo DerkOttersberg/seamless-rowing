@@ -1,1 +1,22 @@
-{"required":true,"package":"qa.rowing.mixin","compatibilityLevel":"JAVA_25","client":["ArmContactProbe","FrameProbe","SubmittedArmProbe","NativePaddleProbe","SkinProbe","PaddleSoundProbe","ShutdownProbe","BodySurfaceProbe"],"injectors":{"defaultRequire":1}}
+{
+  "required": true,
+  "package": "qa.rowing.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "ArmContactProbe",
+    "FrameProbe",
+    "SubmittedArmProbe",
+    "NativePaddleProbe",
+    "RenderedPaddleProbe",
+    "EmfPaddleTransformProbe",
+    "RealCameraCaptureProbe",
+    "SkinProbe",
+    "PaddleSoundProbe",
+    "ShutdownProbe",
+    "BodySurfaceProbe",
+    "SubmittedBoatProbe"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -49,7 +49,7 @@ public final class RemoteScenario {
             if(local==50) net.minecraft.client.KeyMapping.click(com.mojang.blaze3d.platform.InputConstants.Type.MOUSE.getOrCreate(0));
             if(local==62) net.minecraft.client.KeyMapping.click(com.mojang.blaze3d.platform.InputConstants.Type.MOUSE.getOrCreate(1));
             if(local==62) System.out.println("ROWING_USE_RESULT "+mc.gameMode.useItem(mc.player,InteractionHand.MAIN_HAND)+" held="+mc.player.getMainHandItem()+" using="+mc.player.isUsingItem());
-            if(net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("player_animation_library")) {
+            if(qa.rowing.QaPlatform.isModLoaded("player_animation_library")) {
                 PalProbe.tick(mc,local>=24&&local<30);
                 if(local>=25&&local<30&&RowingClient.capture(mc.player,1,mc.options.getCameraType().isFirstPerson())==null) palReleased++;
             }
@@ -75,7 +75,7 @@ public final class RemoteScenario {
         if((role.equals("rower")&&tick==425)||(role.equals("observer")&&Files.exists(mc.gameDirectory.toPath().getParent().resolve("mp-rower-done")))) {
             boolean pass=owned>40&&FrameContact.samples()>10&&FrameContact.maximum()<=1;
             if(role.equals("rower")) pass&=useReleased>0&&swingsReleased>0&&postStop>0&&backwards>0;
-            if(role.equals("rower")&&net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("player_animation_library")) pass&=palReleased>0;
+            if(role.equals("rower")&&qa.rowing.QaPlatform.isModLoaded("player_animation_library")) pass&=palReleased>0;
             Map<String,Object> result=new LinkedHashMap<>();result.put("pass",pass);result.put("role",role);
             result.put("ownedTicks",owned);result.put("itemUseReleasedTicks",useReleased);result.put("swingReleasedTicks",swingsReleased);
             result.put("stoppedTicks",postStop);result.put("backwardsVanillaTicks",backwards);

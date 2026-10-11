@@ -1,4 +1,4 @@
-package io.github.derkottersberg.seamlessrowing.fabric.integration;
+package io.github.derkottersberg.seamlessrowing.integration;
 
 import com.zigythebird.playeranim.api.PlayerAnimationAccess;
 import net.minecraft.client.player.AbstractClientPlayer;

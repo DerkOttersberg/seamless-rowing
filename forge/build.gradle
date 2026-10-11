@@ -1,0 +1,35 @@
+plugins { id 'dev.architectury.loom-no-remap' }
+sourceSets.main {
+    java.srcDir rootProject.file('common/src/main/java')
+    java.srcDir rootProject.file('loader-adapters/src/main/java')
+    resources.srcDir rootProject.file('common/src/main/resources')
+}
+dependencies {
+    minecraft libs.minecraft
+    forge libs.forge
+    compileOnly 'maven.modrinth:entity-model-features:N7d5LddE'
+    compileOnly 'maven.modrinth:entitytexturefeatures:O8J3sxxp'
+    compileOnly 'maven.modrinth:real-camera:ROhlZqcT'
+    compileOnly('tr7zw:FirstPersonModel:2.7.3') { artifact { name = 'firstperson-fabric'; type = 'jar' } }
+    compileOnly('tr7zw:NotEnoughAnimations:1.12.5') { artifact { name = 'notenoughanimations-fabric'; type = 'jar' } }
+    compileOnly('com.zigythebird:PlayerAnimationLibrary:1.2.8') { artifact { name = 'PlayerAnimationLibMerged'; type = 'jar' } }
+}
+loom { mods { seamlessrowing { sourceSet sourceSets.main } } }
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('META-INF/mods.toml') { expand version: project.version }
+}
+tasks.named('jar') {
+    from rootProject.file('LICENSE')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest { attributes 'Automatic-Module-Name': 'io.github.derkottersberg.seamlessrowing', 'MixinConfigs': 'seamlessrowing.mixins.json,seamlessrowing.compat.mixins.json' }
+    archiveFileName = "${rootProject.archives_base_name}-${project.version}-forge.jar"
+}
+tasks.named('sourcesJar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName = "${rootProject.archives_base_name}-${project.version}-forge-sources.jar"
+}
+configurations.forgeRuntimeLibrary {
+    exclude group: 'dev.architectury', module: 'architectury-naming-service'
+    exclude group: 'dev.architectury', module: 'architectury-mixin-remapper-service'
+}

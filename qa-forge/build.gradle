@@ -1,0 +1,12 @@
+dependencies { compileOnly project(':forge'); compileOnly libs.mixin }
+sourceSets.main {
+    java.srcDir rootProject.file('qa/src/main/java')
+    java.exclude '**/QaFabricClient.java'
+    resources.srcDir rootProject.file('qa/src/main/resources')
+    resources.exclude 'fabric.mod.json'
+    compileClasspath += project(':forge').sourceSets.main.compileClasspath
+}
+tasks.named('jar') {
+    archiveFileName='seamless-rowing-qa-forge.jar'
+    manifest { attributes 'MixinConfigs':'rowing-qa.mixins.json' }
+}

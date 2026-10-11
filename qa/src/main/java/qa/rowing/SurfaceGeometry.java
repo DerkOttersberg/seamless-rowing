@@ -12,6 +12,7 @@ public final class SurfaceGeometry {
     private static int samples,brokenRings,invalidFaces;
     private static double wristError;
     private static int bodySamples,restoredBodies,failedBodyRestores;
+    private static int restoredCustomBodies;
     private static double neckError,minNeckZ=Double.POSITIVE_INFINITY,maxNeckZ=Double.NEGATIVE_INFINITY;
     private static final Map<ModelPart,Boolean> skinBodies=new WeakHashMap<>();
     private static final Map<ModelPart,Boolean> relocatedHeads=new WeakHashMap<>();
@@ -29,10 +30,15 @@ public final class SurfaceGeometry {
     }
     public static void body(net.minecraft.client.model.player.PlayerModel model,io.github.derkottersberg.seamlessrowing.client.RowingPose row) {
         var cubes=((ModelPartAccess)(Object)model.body).rowingCubes();
+        if(row==null&&qa.rowing.QaPlatform.isModLoaded("entity_model_features")&&FreshProbe.customVariant(model)) {
+            // EMF's custom variant attaches geometry to children of the native body slot.
+            // The loaded, hash-verified Fresh rig leaves that slot empty.
+            restoredCustomBodies++;if(!cubes.isEmpty())failedBodyRestores++;return;
+        }
         if(!skinBodies.getOrDefault(model.body,true)){inflatedEquipmentBodies++;return;}
         if(row==null) {restoredBodies++;if(cubes.size()!=1)failedBodyRestores++;return;}
         if(Minecraft.getInstance().options.getCameraType().isFirstPerson()
-                && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("firstperson")
+                && qa.rowing.QaPlatform.isModLoaded("firstperson")
                 && (relocatedHeads.getOrDefault(model.body,false)||Math.abs(model.head.y)>1000)) {
             relocatedHeadSamples++;
             if(Math.abs(model.head.y)<1000)changedHiddenHeads++;
@@ -82,12 +88,13 @@ public final class SurfaceGeometry {
         report.put("brokenSharedRings",brokenRings);report.put("invalidFaces",invalidFaces);
         report.put("maximumSkinWristToBonePixels",wristError);
         report.put("nativeBodySamples",bodySamples);report.put("restoredVanillaBodySamples",restoredBodies);
+        report.put("restoredFreshBodySamples",restoredCustomBodies);
         report.put("inflatedEquipmentBodySamplesExcludedFromSkinNeckCheck",inflatedEquipmentBodies);
         report.put("hiddenBodySamples",hiddenBodySamples);report.put("firstPersonModelRelocatedHeads",relocatedHeadSamples);
         report.put("changedHiddenHeads",changedHiddenHeads);
         report.put("failedBodyRestores",failedBodyRestores);report.put("maximumNeckToTorsoPixels",neckError);
         if(bodySamples>0)report.put("neckForwardRangePixels",maxNeckZ-minNeckZ);
-        report.put("pass",samples>0&&brokenRings==0&&invalidFaces==0&&wristError<.001&&bodySamples>0&&restoredBodies>0&&failedBodyRestores==0&&neckError<.001&&changedHiddenHeads==0);
+        report.put("pass",samples>0&&brokenRings==0&&invalidFaces==0&&wristError<.001&&bodySamples>0&&restoredBodies+restoredCustomBodies>0&&failedBodyRestores==0&&neckError<.001&&changedHiddenHeads==0);
         try {Files.writeString(mc.gameDirectory.toPath().resolve("rowing-surface.json"),new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(report));}
         catch(Exception failure){throw new RuntimeException(failure);}
     }

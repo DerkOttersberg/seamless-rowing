@@ -7,4 +7,5 @@ qa-artifacts/
 logs/
 release-preview/
 .qa-motion-wsl/
+.qa-ports-wsl/
 __pycache__/

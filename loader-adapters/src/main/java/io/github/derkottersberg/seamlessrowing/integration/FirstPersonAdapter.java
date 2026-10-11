@@ -1,4 +1,4 @@
-package io.github.derkottersberg.seamlessrowing.fabric.integration;
+package io.github.derkottersberg.seamlessrowing.integration;
 
 import dev.tr7zw.firstperson.api.ActivationHandler;
 import dev.tr7zw.firstperson.api.FirstPersonAPI;

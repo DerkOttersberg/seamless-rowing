@@ -1,4 +1,4 @@
-package io.github.derkottersberg.seamlessrowing.fabric.integration;
+package io.github.derkottersberg.seamlessrowing.integration;
 
 import dev.tr7zw.notenoughanimations.api.*;
 import dev.tr7zw.notenoughanimations.access.PlayerData;

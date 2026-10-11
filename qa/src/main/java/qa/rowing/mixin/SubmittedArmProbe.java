@@ -23,7 +23,7 @@ public class SubmittedArmProbe {
     private void measure(SubmitNodeCollector collector,Model<ArmRigModel.DrawState> model,Object data,PoseStack stack,Identifier texture,int light,int overlay,int outline) {
         var snapshot=(ArmRigModel.DrawState)data;
         model.setupAnim(snapshot);
-        if(probe$pose!=null) for(boolean left:new boolean[]{true,false}) {
+        if(!qa.rowing.CameraCapturePass.active&&probe$pose!=null) for(boolean left:new boolean[]{true,false}) {
             if(!probe$pose.owns(left)||probe$pose.weight(left)<.999) continue;
             var upper=model.root().getChild(left?"left":"right");var lower=upper.getChild("lower");
             qa.rowing.ArmAnatomy.submitted(upper,lower);
