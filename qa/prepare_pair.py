@@ -5,6 +5,8 @@ root=Path(r'D:\SeamlessRowingQA-20261011')
 repo=Path(__file__).resolve().parents[1]
 name=sys.argv[1] if len(sys.argv)>1 else 'pair1'
 if not name.isalnum(): raise ValueError('Invalid pair ID')
+fixture_run=sys.argv[2] if len(sys.argv)>2 else 'r9'
+if not fixture_run.isalnum(): raise ValueError('Invalid fixture profile')
 pair=root/name
 if pair.exists(): raise ValueError('Use a fresh pair ID')
 pair.mkdir()
@@ -20,7 +22,7 @@ for role,user in [('rower','RowQA'),('observer','ObserverQA')]:
     (pair/(role+'.json')).write_text(json.dumps(cmd))
     # The marker belongs to this pair; one parent root can host only one current pair.
 server=pair/'server';server.mkdir()
-shutil.copytree(root/'client-r9/saves/rowing-world',server/'rowing-world')
+shutil.copytree(root/('client-'+fixture_run)/'saves/rowing-world',server/'rowing-world')
 shutil.copy2(Path(r'D:\SeamlessDogsProduction-20261006\fabric-26.3-server-1\server.jar'),server/'server.jar')
 (server/'eula.txt').write_text('eula=true\n')
 (server/'server.properties').write_text('server-ip=127.0.0.1\nserver-port=25961\nonline-mode=false\nenforce-secure-profile=false\nwhite-list=false\nlevel-name=rowing-world\ngamemode=creative\ndifficulty=peaceful\nview-distance=4\nsimulation-distance=4\nmax-players=2\nspawn-protection=0\nenable-rcon=true\nrcon.port=25962\nrcon.password=owned-rowing-loopback-test\nsync-chunk-writes=false\n')

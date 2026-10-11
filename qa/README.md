@@ -19,4 +19,6 @@ The preview runner uses a temporary WSL distro, a private Xvfb display per clien
 
 `export_preview.py` validates passes and actual before/after JAR hashes, then copies reports, logs and representative stills into ignored `qa-artifacts`. `encode_preview.sh` encodes the native capture sequence at 20 client ticks per second; this is animation evidence, not a high-frame-rate benchmark. The isolated null audio driver keeps tests silent, while the sound probe records native, non-relative paddle sound submissions.
 
+For the elbow correction, `export_elbow_preview.py` freezes separate preview.2 evidence. The anatomy probe checks forward flexion, absence of sideways hinge bending and fixed lengths from solver output, then independently checks the actual submitted model-part transforms after `setupAnim`. Contact measurements alone do not establish anatomically correct elbow direction. Both short GIFs and long captures must be reviewed through complete strokes.
+
 The final runner contains a frozen candidate hash deliberately: rebuilds that change the release JAR require a fresh candidate, fresh profiles and new acceptance evidence. Failed test history is retained in diagnostics rather than presented as a pass. Export evidence before removing the temporary distro; do not package this QA JAR in install bundles.

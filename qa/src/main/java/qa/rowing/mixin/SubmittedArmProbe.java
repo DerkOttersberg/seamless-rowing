@@ -26,6 +26,7 @@ public class SubmittedArmProbe {
         if(probe$pose!=null) for(boolean left:new boolean[]{true,false}) {
             if(!probe$pose.owns(left)||probe$pose.weight(left)<.999) continue;
             var upper=model.root().getChild(left?"left":"right");var lower=upper.getChild("lower");
+            qa.rowing.ArmAnatomy.submitted(upper,lower);
             stack.pushPose();upper.translateAndRotate(stack);lower.translateAndRotate(stack);
             FrameContact.hand(left,stack.last().pose().transformPosition(new Vector3f(0,6f/16,0)));
             stack.popPose();

@@ -3,7 +3,9 @@ set -euo pipefail
 stage=/mnt/d/SeamlessRowingQA-20261011
 pair=${1:-pair9}
 [[ "$pair" =~ ^pair[0-9]+$ ]] || { echo 'Invalid pair ID' >&2; exit 1; }
-output=/mnt/c/Users/derko/Desktop/minecraft/seamless-rowing/qa-artifacts/preview-26.3-fabric/media
+output=${2:-/mnt/c/Users/derko/Desktop/minecraft/seamless-rowing/qa-artifacts/preview-26.3-fabric/media}
+sample=${3:-r23}
+[[ "$sample" =~ ^[[:alnum:]]+$ ]] || { echo 'Invalid sample profile' >&2; exit 1; }
 mkdir -p "$output"
 encode() {
     local profile="$1" first="$2" frames="$3" name="$4"
@@ -22,7 +24,7 @@ for clip in first-person-stroke third-person-stroke; do
     filter='scale=800:-1:flags=lanczos'
     if [[ "$clip" == third-person-stroke ]]; then first=220; filter='crop=640:360:320:280,scale=800:-1:flags=lanczos'; fi
     ffmpeg -hide_banner -loglevel error -y -threads 2 -framerate 20 -start_number "$first" \
-        -i "$stage/client-r23/screenshots/rowing-%03d.png" -frames:v 32 \
+        -i "$stage/client-$sample/screenshots/rowing-%03d.png" -frames:v 32 \
         -filter_complex "[0:v]$filter,split[a][b];[a]palettegen=max_colors=96:stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a" \
         -loop 0 "$output/$clip.gif"
 done

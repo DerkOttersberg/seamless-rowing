@@ -5,9 +5,51 @@ import io.github.derkottersberg.seamlessrowing.client.PaddleTrack;
 import io.github.derkottersberg.seamlessrowing.client.StrokeProfile;
 import io.github.derkottersberg.seamlessrowing.client.ControllerEligibility;
 import org.junit.jupiter.api.Test;
+import org.joml.Vector3f;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AnimationRegressionTest {
+    @Test void rowingElbowsFlexForwardWithoutTwistingOrReversingOverFullStrokes() {
+        for(boolean left:new boolean[]{false,true}) {
+            int side=left?1:-1;
+            Vector3f previousElbow=null,previousHand=null;
+            org.joml.Quaternionf previousUpper=null,previousLower=null;
+            for(int frame=0;frame<=1024;frame++) {
+                double phase=frame*Math.PI/512;
+                Point3 shoulder=new Point3(side*5,0,0);
+                Point3 target=new Point3(side*(7+2*Math.sin(phase)),5+Math.cos(phase),8*Math.sin(phase));
+                var pose=RowingArmKinematics.solve(shoulder,target,left,new Point3(side*Math.cos(phase),-.5,Math.sin(phase)));
+                Vector3f upper=new Vector3f(0,6,0).rotate(pose.upper());
+                Vector3f localLower=new Vector3f(0,6,0).rotate(pose.lower());
+                assertEquals(0,localLower.x,2e-5,"No sideways elbow hinge");
+                assertTrue(localLower.z<0,"Elbow must flex towards the front of its upper arm");
+                Vector3f lower=new Vector3f(localLower).rotate(pose.upper());
+                Vector3f elbow=new Vector3f((float)shoulder.x(),0,0).add(upper);
+                Vector3f hand=new Vector3f(elbow).add(lower);
+                assertEquals(6,upper.length(),2e-5);assertEquals(6,lower.length(),2e-5);
+                assertTrue(hand.distance(new Vector3f((float)target.x(),(float)target.y(),(float)target.z()))<2e-5);
+                assertTrue(pose.joints().elbow().z()>target.z()*.5,"Posterior elbow branch");
+                assertTrue(new Vector3f(1,0,0).rotate(pose.upper()).x>0,"Hinge must not roll upside down on rearward reaches");
+                if(previousElbow!=null) {
+                    assertTrue(elbow.distance(previousElbow)<.1,"Continuous elbow path");
+                    assertTrue(hand.distance(previousHand)<.1,"Continuous wrist path");
+                    assertTrue(Math.abs(pose.upper().dot(previousUpper))>.999,"No upper-arm twist jumps");
+                    assertTrue(Math.abs(pose.lower().dot(previousLower))>.999,"No wrist twist jumps");
+                }
+                previousElbow=elbow;previousHand=hand;
+                previousUpper=pose.upper();previousLower=pose.lower();
+            }
+        }
+    }
+    @Test void anatomicalFramesRemainFiniteAtCollapsedAndUnreachableTargets() {
+        for(boolean left:new boolean[]{false,true}) for(Point3 target:new Point3[]{Point3.ZERO,new Point3(0,80,0),new Point3(0,-80,0),new Point3(0,0,80)}) {
+            var pose=RowingArmKinematics.solve(Point3.ZERO,target,left,new Point3(0,0,1));
+            assertTrue(pose.upper().isFinite());assertTrue(pose.lower().isFinite());
+            Vector3f upper=new Vector3f(0,6,0).rotate(pose.upper());
+            Vector3f lower=new Vector3f(0,6,0).rotate(pose.lower()).rotate(pose.upper());
+            assertEquals(6,upper.length(),2e-5);assertEquals(6,lower.length(),2e-5);
+        }
+    }
     @Test void passengersAndInvalidControllersNeverOwnRowing() {
         for(int flags=0;flags<64;flags++) {
             var policy=new ControllerEligibility((flags&1)!=0,(flags&2)!=0,(flags&4)!=0,

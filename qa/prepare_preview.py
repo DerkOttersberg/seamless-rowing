@@ -16,7 +16,8 @@ if not world.exists():
 mods = client / 'mods'
 mods.mkdir(exist_ok=True)
 shutil.copy2(fixture / 'mods' / 'fabric-api-0.161.0+26.3.jar', mods)
-shutil.copy2(repo / 'fabric/build/libs/seamless-rowing-0.1.0-preview.1+mc26.3-fabric.jar', mods)
+version=next(line.split('=',1)[1] for line in (repo/'gradle.properties').read_text().splitlines() if line.startswith('mod_version='))
+shutil.copy2(repo / ('fabric/build/libs/seamless-rowing-'+version+'-fabric.jar'), mods)
 shutil.copy2(repo / 'qa/build/libs/seamless-rowing-qa.jar', mods)
 (client / 'options.txt').write_text('renderDistance:4\nsimulationDistance:5\nmaxFps:30\nvsync:false\npauseOnLostFocus:false\nguiScale:2\nfov:0.0\ncloudStatus:0\nparticles:2\nshowSubtitles:true\n', encoding='utf-8')
 command = json.loads((stage / 'client-command.json').read_text())

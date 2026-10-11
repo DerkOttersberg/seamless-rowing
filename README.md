@@ -4,13 +4,13 @@ Client-only boat rowing animation with paddle-driven articulated arms, original 
 
 ## Preview
 
-The first preview targets **Minecraft 26.3 / Fabric 0.19.5 / Fabric API 0.161.0+26.3 / Java 25**. Install the Fabric JAR and Fabric API on your client. SeamlessLib and a runtime animation framework are not required. A vanilla multiplayer server works unchanged; each viewer needs this mod to see its animation.
+Preview **0.1.0-preview.2** corrects the backwards elbow bend and excessive wrist twist in the first preview. It targets **Minecraft 26.3 / Fabric 0.19.5 / Fabric API 0.161.0+26.3 / Java 25**. Install the Fabric JAR and Fabric API on your client. SeamlessLib and a runtime animation framework are not required. A vanilla multiplayer server works unchanged; each viewer needs this mod to see its animation.
 
 Use normal boat controls. Only the controlling rider animates. Forward/turning strokes follow native paddles; backwards-only movement keeps vanilla behavior. Item use releases both hands, and attacking releases the active hand. Selected items are hidden visually while their hand rows; inventory and boat physics are unchanged. Sounds remain vanilla, including resource-pack replacements.
 
 Bind **Open rowing settings** in Options → Controls → Key Binds → Seamless Rowing. It starts unbound. Optional Mod Menu exposes the same screen. The settings screen has enable, first person, third person, articulated elbows and torso toggles. Save writes a validated client JSON with an atomic replacement and previous-file backup; Cancel discards the draft.
 
-Unrecognized replacement player/boat renderers and modded boat IDs retain their existing rendering. The 3D Skin Layers fallback uses rigid third-person arms and preserves its first-person rendering. Only version-matched optional APIs are enabled; unsupported versions disable rowing and appear in compatibility status. Custom boat resource-pack geometry remains a compatibility gate. See [the acceptance report](docs/PREVIEW_ACCEPTANCE.md) for actual tested combinations and limits. This preview is not an all-version production release.
+Unrecognized replacement player/boat renderers and modded boat IDs retain their existing rendering. The 3D Skin Layers fallback uses rigid third-person arms and preserves its first-person rendering. Only version-matched optional APIs are enabled; unsupported versions disable rowing and appear in compatibility status. Custom boat resource-pack geometry remains a compatibility gate. See [the current preview report](docs/ELBOW_PREVIEW_ACCEPTANCE.md) for tested combinations and limits, and [the first preview report](docs/PREVIEW_ACCEPTANCE.md) for historical evidence. This preview is not an all-version production release.
 
 ## Build and architecture
 

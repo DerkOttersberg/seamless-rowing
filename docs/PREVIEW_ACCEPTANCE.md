@@ -1,5 +1,7 @@
 # 26.3 Fabric preview acceptance
 
+**Historical preview.1 evidence.** User visual review found backwards elbow bending despite the passing hand-contact checks. Its animation is superseded by preview.2; these results do not establish acceptance of the new JAR. See [the correction report](ELBOW_PREVIEW_ACCEPTANCE.md).
+
 Date: **2026-10-11**. Scope: **0.1.0-preview.1+mc26.3**, Fabric Loader 0.19.5, Fabric API 0.161.0+26.3, Java 25. This is the requested animation feedback checkpoint. **Production release gates and the other ten builds remain open.**
 
 Release JAR: `seamless-rowing-0.1.0-preview.1+mc26.3-fabric.jar`
