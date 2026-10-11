@@ -10,6 +10,7 @@ public interface ClientPlatformServices extends PlatformServices {
     }
     boolean consumeSettingsClick();
     default boolean paddleVisibilityHandoff() {return false;}
+    default boolean customBoatGeometry() {return false;}
     default boolean animationSchedulerActive() { return false; }
     default boolean externalAnimationActive(net.minecraft.client.player.AbstractClientPlayer player) { return false; }
     default boolean unsupportedAnimationIntegration() { return false; }

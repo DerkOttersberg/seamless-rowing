@@ -6,6 +6,9 @@ import org.spongepowered.asm.mixin.*;
 
 @Mixin(BoatRenderState.class)
 public class BoatStateMixin implements BoatState {
+    @Unique private boolean rowing$restorePaddles;
+    public boolean rowingRestorePaddles(){return rowing$restorePaddles;}
+    public void rowingRestorePaddles(boolean restore){rowing$restorePaddles=restore;}
     @Unique private RowingPose rowing$pose;
     @Unique private AvatarRenderState rowing$local;
     public RowingPose rowingBoatPose(){return rowing$pose;}

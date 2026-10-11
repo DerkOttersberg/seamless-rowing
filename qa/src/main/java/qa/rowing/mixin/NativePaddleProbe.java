@@ -17,6 +17,7 @@ public class NativePaddleProbe {
     @Inject(method="setupAnim(Lnet/minecraft/client/renderer/entity/state/BoatRenderState;)V",at=@At("RETURN"))
     private void measure(BoatRenderState state,CallbackInfo ci) {
         var pose=((BoatState)state).rowingBoatPose();
+        qa.rowing.PaddleVisibility.inspect(((BoatState)state).rowingRestorePaddles(),leftPaddle,rightPaddle);
         RenderedPaddles.register(leftPaddle,true,state.rowingTimeLeft,pose);
         RenderedPaddles.register(rightPaddle,false,state.rowingTimeRight,pose);
     }

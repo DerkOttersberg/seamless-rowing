@@ -41,7 +41,7 @@ final class TexturedSurface {
         submittedCubes=List.copyOf(cubes);
     }
     private ModelPart.Cube emptyCube() {
-        var cube=new ModelPart.Cube(0,0,-2,0,-2,4,12,4,0,0,0,false,64,64,EnumSet.allOf(Direction.class));
+        var cube=new SurfaceCube();
         Arrays.fill(cube.polygons,new ModelPart.Polygon(new ModelPart.Vertex[0],new Vector3f(0,1,0)));
         cubes.add(cube);return cube;
     }
@@ -74,3 +74,4 @@ final class TexturedSurface {
         return output;
     }
 }
+

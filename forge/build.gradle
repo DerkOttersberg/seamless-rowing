@@ -33,3 +33,6 @@ configurations.forgeRuntimeLibrary {
     exclude group: 'dev.architectury', module: 'architectury-naming-service'
     exclude group: 'dev.architectury', module: 'architectury-mixin-remapper-service'
 }
+
+// Public, compile-only optional action API; its implementation remains in Throw Weapons.
+dependencies { compileOnly project(':optional-api-stubs') }

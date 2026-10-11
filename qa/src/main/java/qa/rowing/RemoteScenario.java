@@ -18,6 +18,7 @@ public final class RemoteScenario {
             try {Files.writeString(mc.gameDirectory.toPath().resolve("mp-client-ready"),role);announced=true;}
             catch(Exception failure){throw new RuntimeException(failure);}
         }
+        MultiplayerMarkers.joined(mc,role);
         if(!Files.exists(ready)) return;
         if(first) {first=false;System.out.println("ROWING_MP_READY "+role);}
         if(role.equals("rower")&&mc.player.getVehicle()==null) return;
@@ -35,6 +36,7 @@ public final class RemoteScenario {
             }
             warmup++;return;
         }
+        if(MultiplayerMarkers.hold(mc,role,tick))return;
         tick++;
         if(role.equals("rower")) {
             int local=(tick-1)%140;
@@ -67,19 +69,23 @@ public final class RemoteScenario {
                 if(pose!=null&&(pose.ownLeft()||pose.ownRight())) owned++;
             }
         }
+        MultiplayerMarkers.established(mc,role,owned);
+        PassengerScenario.tick(mc,role,tick);
         if(tick<(role.equals("observer")?900:420)) Screenshot.grab(mc.gameDirectory,String.format("mp-%04d.png",tick),mc.gameRenderer.mainRenderTarget(),1,message->{});
-        if(role.equals("rower")&&tick==425) {
+        if(role.equals("rower")&&tick==500) {
             try {Files.writeString(mc.gameDirectory.toPath().getParent().resolve("mp-rower-done"),"done");}
             catch(Exception failure){throw new RuntimeException(failure);}
         }
-        if((role.equals("rower")&&tick==425)||(role.equals("observer")&&Files.exists(mc.gameDirectory.toPath().getParent().resolve("mp-rower-done")))) {
-            boolean pass=owned>40&&FrameContact.samples()>10&&FrameContact.maximum()<=1;
+        if((role.equals("rower")&&tick==500)||(role.equals("observer")&&Files.exists(mc.gameDirectory.toPath().getParent().resolve("mp-rower-done")))) {
+            boolean pass=owned>40&&FrameContact.samples()>10&&FrameContact.maximum()<=1&&FrameContact.duplicates()==0;
+            if(role.equals("observer"))pass&=PassengerScenario.ticks()>8;
             if(role.equals("rower")) pass&=useReleased>0&&swingsReleased>0&&postStop>0&&backwards>0;
             if(role.equals("rower")&&qa.rowing.QaPlatform.isModLoaded("player_animation_library")) pass&=palReleased>0;
             Map<String,Object> result=new LinkedHashMap<>();result.put("pass",pass);result.put("role",role);
             result.put("ownedTicks",owned);result.put("itemUseReleasedTicks",useReleased);result.put("swingReleasedTicks",swingsReleased);
             result.put("stoppedTicks",postStop);result.put("backwardsVanillaTicks",backwards);
             result.put("activePalReleasedTicks",palReleased);
+            result.put("nonControllerPassengerTicks",PassengerScenario.ticks());
             result.put("nativeSamples",FrameContact.samples());result.put("nativeMaximumErrorPixels",FrameContact.maximum());result.put("views",FrameContact.views());
             result.put("strokePhaseBins",FrameContact.phaseBins());result.put("duplicateArmSubmissions",FrameContact.duplicates());result.put("nativePaddleSounds",SoundProbe.count());
             try {Files.writeString(mc.gameDirectory.toPath().resolve("rowing-multiplayer.json"),new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(result));}
@@ -88,9 +94,11 @@ public final class RemoteScenario {
         }
     }
     private static void observerCamera(Minecraft mc,net.minecraft.client.player.AbstractClientPlayer rower) {
+        if(mc.player.getVehicle()!=null)return;
         var origin=rower.position();mc.player.setPos(origin.x+3,origin.y+1.8,origin.z+4);
         var target=rower.position().add(0,.5,0).subtract(mc.player.getEyePosition());
         mc.player.setYRot((float)Math.toDegrees(Math.atan2(-target.x,target.z)));
         mc.player.setXRot((float)-Math.toDegrees(Math.atan2(target.y,Math.hypot(target.x,target.z))));
+        mc.player.setYHeadRot(mc.player.getYRot());mc.player.setOldPosAndRot();
     }
 }

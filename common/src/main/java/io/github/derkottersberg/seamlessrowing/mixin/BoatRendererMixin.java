@@ -18,9 +18,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class BoatRendererMixin {
     @Inject(method="extractRenderState(Lnet/minecraft/world/entity/vehicle/boat/AbstractBoat;Lnet/minecraft/client/renderer/entity/state/BoatRenderState;F)V",at=@At("RETURN"))
     private void rowing$capture(AbstractBoat boat,BoatRenderState state,float partial,CallbackInfo ci) {
-        BoatState row=(BoatState)state; row.rowingBoatPose(null); row.rowingLocalPlayer(null);
+        BoatState row=(BoatState)state; row.rowingBoatPose(null); row.rowingLocalPlayer(null);row.rowingRestorePaddles(false);
         if(boat.getControllingPassenger() instanceof AbstractClientPlayer driver) {
             var mc=Minecraft.getInstance(); boolean first=driver==mc.player && mc.options.getCameraType().isFirstPerson();
+            row.rowingRestorePaddles(first&&RowingClient.restoresPaddles()&&RowingClient.managesFirstPersonBoat());
             row.rowingBoatPose(RowingClient.capture(driver,partial,first));
             row.rowingLocalPlayer(RowingClient.firstPersonState(boat,partial));
         }

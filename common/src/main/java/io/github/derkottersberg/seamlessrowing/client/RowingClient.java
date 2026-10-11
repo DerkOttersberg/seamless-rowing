@@ -48,6 +48,7 @@ public final class RowingClient {
     public static void save(ClientSettings draft) throws IOException { draft.save(configPath()); settings=draft; clear(); }
     public static void clear() { TRACKS.clear(); levelIdentity=null; }
     public static String compatibilityStatus() {
+        if(platform.customBoatGeometry())return "Custom boat resource geometry: existing boat and player rendering preserved.";
         if(platform.unsupportedAnimationIntegration()) return platform.integrationStatus();
         if (platform.isModLoaded("figura") || platform.isModLoaded("cpm") || platform.isModLoaded("epicfight"))
             return "Custom player rig detected: rowing visuals safely disabled.";
@@ -141,6 +142,7 @@ public final class RowingClient {
                 geometry.shaft(boatMatrix,l,false),geometry.shaft(boatMatrix,r,true));
     }
     private static PaddleGeometry geometry(AbstractBoat boat) {
+        if(platform.customBoatGeometry())return null;
         var renderer=Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(boat);
         for(var adapter:GEOMETRY) if(adapter.matches(boat,renderer)) return adapter;
         return null;

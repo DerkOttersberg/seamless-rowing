@@ -14,10 +14,13 @@ import java.util.HexFormat;
 
 /** Uses EMF's public per-entity model condition, never a persistent model/animation lock. */
 public final class EmfAdapter {
-    private static boolean fresh;
+    private static boolean fresh,customBoat;
     public static void reload(ResourceManager resources) {
         fresh=FreshPlayerRig.known(digest(resources,"player.jem"),digest(resources,"player_slim.jem"));
+        customBoat=java.util.stream.Stream.of("emf/cem","optifine/cem").anyMatch(root->
+            !resources.listResources(root,id->BoatRigResourcePolicy.replacement(id.getNamespace(),id.getPath())).isEmpty());
     }
+    public static boolean customBoat(){return customBoat;}
     private static String digest(ResourceManager resources,String file) {
         var resource=resources.getResource(Identifier.fromNamespaceAndPath("minecraft","emf/cem/"+file));
         if(resource.isEmpty())return "";

@@ -14,6 +14,8 @@
     "SkinProbe",
     "PaddleSoundProbe",
     "ShutdownProbe",
+    "SurfaceSubmissionProbe",
+    "FirstPersonBodyProbe",
     "BodySurfaceProbe",
     "SubmittedBoatProbe"
   ],
@@ -21,3 +23,5 @@
     "defaultRequire": 1
   }
 }
+
+

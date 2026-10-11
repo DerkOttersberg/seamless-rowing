@@ -10,3 +10,5 @@ tasks.named('jar') {
     archiveFileName='seamless-rowing-qa-forge.jar'
     manifest { attributes 'MixinConfigs':'rowing-qa.mixins.json' }
 }
+
+dependencies { compileOnly project(':optional-api-stubs') }

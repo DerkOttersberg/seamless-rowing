@@ -21,7 +21,11 @@ public final class FreshScenario {
         // Sweep the real camera toward each grip instead of measuring only off-screen hands.
         float yaw=tick<85?(tick<30?-55:tick<54?0:55):0;
         mc.player.setYRot(mc.player.getVehicle()==null?yaw:mc.player.getVehicle().getYRot()+yaw);
-        mc.player.setXRot(tick<85?60:-15);
+        mc.player.setXRot(tick<85?60:tick<155?20:-15);
+        if(qa.rowing.QaPlatform.isModLoaded("punchy")&&(tick==1||tick==11)) {
+            try{RowingClient.save(new io.github.derkottersberg.seamlessrowing.config.ClientSettings(tick==11,true,true,true,true));}
+            catch(java.io.IOException error){throw new IllegalStateException(error);}
+        }
         mc.options.keyUp.setDown(tick>=12&&tick<70||tick>=100&&tick<140||tick>=160&&tick<200||tick>=230&&tick<250);
         mc.options.keyLeft.setDown(tick>=45&&tick<55);
         mc.options.keyUse.setDown(tick>=38&&tick<48||tick>=114&&tick<124);

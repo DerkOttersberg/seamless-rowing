@@ -66,3 +66,4 @@ public final class ArmRigModel extends Model<ArmRigModel.DrawState> {
         Vector3f angles=q.getEulerAnglesZYX(new Vector3f()); part.setRotation(angles.x,angles.y,angles.z);
     }
 }
+
