@@ -13,6 +13,7 @@ public final class RowingQaClient {
     private final AtomicBoolean fixture=new AtomicBoolean();
     private int tick;
     private int missingVehicle;
+    private int startup;
     private static double maxError;
     private static int samples;
     public static void measure(double error) { maxError=Math.max(maxError,error); samples++; }
@@ -22,6 +23,7 @@ public final class RowingQaClient {
     }
     public void tick(Minecraft mc) {
         mc.options.pauseOnLostFocus=false;
+        if(++startup%100==0&&tick==0)System.out.println("ROWING_QA_STARTUP screen="+(mc.gui.screen()==null?"none":mc.gui.screen().getClass().getName())+" player="+(mc.player!=null)+" vehicle="+(mc.player==null?null:mc.player.getVehicle()));
         if(mc.player!=null&&!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if(System.getProperty("qa.rowing.scenario","").equals("settings")) { SettingsScenario.tick(mc);return; }
         if(mc.player==null || mc.level==null || mc.gui.screen()!=null) return;
