@@ -36,6 +36,7 @@ public final class RowingArmLayer extends RenderLayer<AvatarRenderState,PlayerMo
         float weight=pose.weight(left); start.lerp(shoulder,weight); shoulder=start;
         var grip=pose.grip(left);
         Vector3f target=transform.transformPosition(new Vector3f((float)grip.x,(float)grip.y,(float)grip.z)).mul(16);
+        shoulder=ShoulderReach.adjust(shoulder,target,weight);
         var shaft=pose.shaft(left);
         Vector3f paddle=transform.transformDirection(new Vector3f((float)shaft.x,(float)shaft.y,(float)shaft.z));
         var solution=RowingArmKinematics.solve(point(shoulder),point(target),left,point(paddle));

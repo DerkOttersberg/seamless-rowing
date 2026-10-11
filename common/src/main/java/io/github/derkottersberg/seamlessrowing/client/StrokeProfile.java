@@ -2,7 +2,7 @@ package io.github.derkottersberg.seamlessrowing.client;
 
 /** Original periodic pose curve. Minecraft's paddle phase retimes it to the actual stroke. */
 public final class StrokeProfile {
-    private static final float[] DEFAULT={0.035f,0.085f,0.045f,-0.035f,-0.075f,-0.040f,0.0f,0.020f};
+    private static final float[] DEFAULT={0.09f,0.22f,0.13f,-0.07f,-0.20f,-0.11f,0.0f,0.045f};
     private static volatile float[] pitch=DEFAULT.clone();
     private StrokeProfile() {}
     public static float lean(float phase) {
@@ -36,14 +36,14 @@ public final class StrokeProfile {
             if(!points.get(i).isJsonPrimitive() || !points.get(i).getAsJsonPrimitive().isNumber())
                 throw new IllegalArgumentException("Numeric pose keys required");
             result[i]=points.get(i).getAsFloat();
-            if(!Float.isFinite(result[i])||Math.abs(result[i])>.2f) throw new IllegalArgumentException("Pose outside fixed-seat bounds");
+            if(!Float.isFinite(result[i])||Math.abs(result[i])>.3f) throw new IllegalArgumentException("Pose outside fixed-seat bounds");
         }
         return result;
     }
     public static void apply(float[] points) {
         if(points.length!=8) throw new IllegalArgumentException("Eight periodic keys required");
         float[] copy=points.clone();
-        for(float key:copy) if(!Float.isFinite(key)||Math.abs(key)>.2f)
+        for(float key:copy) if(!Float.isFinite(key)||Math.abs(key)>.3f)
             throw new IllegalArgumentException("Pose outside fixed-seat bounds");
         pitch=copy;
     }

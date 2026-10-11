@@ -76,6 +76,7 @@ public final class RowingClient {
         if(!(avatarRenderer instanceof AvatarRenderer<?> avatar)
                 || avatar.getModel().getClass()!=net.minecraft.client.model.player.PlayerModel.class
                 || platform.customPlayerModel(avatar.getModel())
+                || !TorsoSurface.supported(avatar.getModel().body)
                 || !ArmMesh.supported(avatar.getModel().leftArm) || !ArmMesh.supported(avatar.getModel().rightArm)) return false;
         // A replacement renderer needs a verified geometry adapter, even if its entity subclasses a boat.
         var geometry=geometry(boat);
@@ -111,9 +112,10 @@ public final class RowingClient {
         Matrix4f boatMatrix=boatMatrix(boat,partial);
         Vec3 left=relative.add(geometry.grip(boatMatrix,l,false));
         Vec3 right=relative.add(geometry.grip(boatMatrix,r,true));
-        float lean=settings.torso() && !player.isUsingItem()
-                ? (StrokeProfile.lean(boat.getRowingTime(0,partial))*lw+StrokeProfile.lean(boat.getRowingTime(1,partial))*rw)*.5f : 0;
-        return new RowingPose(left,right,lw,rw,ol,or,settings.elbows()&&!skinLayers(),lean,l,r,
+        float lean=settings.torso() && !player.isUsingItem() && !player.isSwinging()
+                ? (track.left.lean(boat.getRowingTime(0,partial),partial)+track.right.lean(boat.getRowingTime(1,partial),partial))*.5f : 0;
+        float twist=settings.torso() && !player.isUsingItem() && !player.isSwinging() ? (l.yaw()*lw-r.yaw()*rw)*.12f : 0;
+        return new RowingPose(left,right,lw,rw,ol,or,settings.elbows()&&!skinLayers(),lean,twist,l,r,
                 geometry.shaft(boatMatrix,l,false),geometry.shaft(boatMatrix,r,true));
     }
     private static PaddleGeometry geometry(AbstractBoat boat) {

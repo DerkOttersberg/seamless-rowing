@@ -20,6 +20,7 @@ public class PlayerModelMixin implements AnimationOwnership {
     // Restore before other animation adapters read the model; compose after their RETURN hooks.
     @Inject(method="setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V",at=@At("HEAD"),order=900)
     private void rowing$restore(AvatarRenderState state,CallbackInfo ci) {
+        TorsoSurface.restore(((PlayerModel)(Object)this).body);
         rowing$hidden.forEach((part,visible)->part.visible=visible);
         rowing$hidden.clear();
         rowing$leftGranted=rowing$rightGranted=!RowingClient.scheduledOwnership();
@@ -31,14 +32,23 @@ public class PlayerModelMixin implements AnimationOwnership {
         if(!rowing$leftGranted || !rowing$rightGranted) {
             row=new RowingPose(row.leftGrip(),row.rightGrip(),row.leftWeight(),row.rightWeight(),
                     row.ownLeft()&&rowing$leftGranted,row.ownRight()&&rowing$rightGranted,
-                    row.articulated(),row.lean(),row.leftPaddle(),row.rightPaddle(),row.leftShaft(),row.rightShaft());
+                    row.articulated(),row.lean(),row.twist(),row.leftPaddle(),row.rightPaddle(),row.leftShaft(),row.rightShaft());
             carrier.rowingPose(row);
         }
         PlayerModel m=(PlayerModel)(Object)this;
-        float lean=row.lean(); float rise=12-12*(float)Math.cos(lean), forward=-12*(float)Math.sin(lean);
-        m.body.xRot+=lean; m.body.y+=rise; m.body.z+=forward;
-        m.head.y+=rise; m.head.z+=forward;
-        m.leftArm.y+=rise; m.leftArm.z+=forward; m.rightArm.y+=rise; m.rightArm.z+=forward;
+        TorsoSurface.apply(m.body,row.lean(),row.twist());
+        // FirstPersonModel may deliberately move the head thousands of pixels away to hide it.
+        // Preserve that decision; a periodic spine curve must never wrap a hidden head back in view.
+        if(!carrier.rowingHandsOnly() && m.head.visible
+                && io.github.derkottersberg.seamlessrowing.math.TorsoMotion.attachedHead(m.head.x-m.body.x,m.head.y-m.body.y,m.head.z-m.body.z)) {
+            var head=io.github.derkottersberg.seamlessrowing.math.TorsoMotion.point(m.head.x,m.head.y,m.head.z,row.lean(),row.twist());
+            m.head.setPos(head.x,head.y,head.z);
+        }
+        for(var arm:new ModelPart[]{m.leftArm,m.rightArm}) {
+            var cube=((ModelPartAccess)(Object)arm).rowingCubes().getFirst();float center=(cube.minX+cube.maxX)*.5f;
+            var shoulder=io.github.derkottersberg.seamlessrowing.math.TorsoMotion.point(arm.x+center,arm.y-2,arm.z,row.lean(),row.twist());
+            arm.setPos(shoulder.x-center,shoulder.y+2,shoulder.z);
+        }
         boolean advanced=row.articulated() && ArmMesh.supported(m.leftArm) && ArmMesh.supported(m.rightArm);
         if(carrier.rowingHandsOnly()) {
             m.allParts().forEach(part->{rowing$hidden.put(part,part.visible);part.visible=false;});

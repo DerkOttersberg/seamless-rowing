@@ -9,6 +9,48 @@ import org.joml.Vector3f;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AnimationRegressionTest {
+    @Test void intentionallyRelocatedHeadsArePreservedForFirstPersonModel() {
+        assertTrue(TorsoMotion.attachedHead(0,0,0));assertTrue(TorsoMotion.attachedHead(0,4.2f,0));
+        for(float offset:new float[]{-5000,5000,Float.NaN,Float.POSITIVE_INFINITY})assertFalse(TorsoMotion.attachedHead(0,offset,0));
+    }
+    @org.junit.jupiter.api.BeforeEach void resetClip() throws Exception {
+        try(var reader=new java.io.InputStreamReader(getClass().getResourceAsStream("/assets/seamlessrowing/animations/fixed_seat.json"),java.nio.charset.StandardCharsets.UTF_8)) {
+            StrokeProfile.apply(StrokeProfile.validate(com.google.gson.JsonParser.parseReader(reader).getAsJsonObject()));
+        }
+    }
+    @Test void continuousArmEnvelopeKeepsWristAndMatchesRigidEndsWithoutSeams() {
+        for(int degrees=0;degrees<=150;degrees+=5) {
+            var rotation=new org.joml.Quaternionf().rotationX((float)Math.toRadians(-degrees)).rotateY(.12f);
+            var surface=new ArmSurface(rotation);
+            assertTrue(surface.point(0,12,0).distance(new Vector3f(0,6,0).rotate(rotation).add(0,6,0))<1e-5);
+            for(float y:new float[]{2,10}) for(float x:new float[]{-2,2}) for(float z:new float[]{-2,2}) {
+                Vector3f before=surface.point(x,y-.0001f,z),after=surface.point(x,y+.0001f,z);
+                assertTrue(before.distance(after)<.001,"Watertight bend boundary");
+                var d0=surface.point(x,y-.002f,z).sub(surface.point(x,y-.004f,z)).normalize();
+                var d1=surface.point(x,y+.004f,z).sub(surface.point(x,y+.002f,z)).normalize();
+                assertTrue(d0.dot(d1)>.995,"Continuous bend tangent");
+            }
+            for(float y=0;y<=12;y+=.125f) assertTrue(surface.point(2,y,2).isFinite());
+        }
+        var straight=new ArmSurface(new org.joml.Quaternionf());
+        for(float y=-.25f;y<=12.25f;y+=.25f) assertEquals(0,straight.point(2,y,2).distance(new Vector3f(2,y,2)),1e-5);
+    }
+    @Test void spineBendsThroughTheChestWhileHipsStaySeatedAndBothShouldersFollow() {
+        float previousZ=Float.NaN,min=100,max=-100;
+        for(int i=0;i<=1024;i++) {
+            float phase=(float)(i*Math.PI/512),lean=StrokeProfile.lean(phase);
+            var hips=TorsoMotion.point(0,12,0,lean,.06f);
+            assertEquals(0,hips.distance(new Vector3f(0,12,0)),1e-6);
+            var neck=TorsoMotion.point(0,0,0,lean,0);
+            min=Math.min(min,neck.z);max=Math.max(max,neck.z);
+            assertTrue(neck.y<.6 && neck.y>=-.00001,"Neck remains attached to the upper torso");
+            if(Float.isFinite(previousZ)) assertTrue(Math.abs(neck.z-previousZ)<.05,"Continuous spine stroke");
+            previousZ=neck.z;
+            var left=TorsoMotion.point(5,0,0,lean,.06f);var right=TorsoMotion.point(-5,0,0,lean,.06f);
+            assertEquals(10,left.distance(right),1e-5,"Fixed shoulder width");
+        }
+        assertTrue(max-min>4.5,"Visible drive and recovery through the torso");
+    }
     @Test void rowingElbowsFlexForwardWithoutTwistingOrReversingOverFullStrokes() {
         for(boolean left:new boolean[]{false,true}) {
             int side=left?1:-1;
@@ -90,6 +132,32 @@ class AnimationRegressionTest {
         assertEquals(0,track.weight(1));
         assertEquals(PaddlePose.at(0),track.sample(0,1));
     }
+    @Test void spineSettlesFromItsCurrentStrokeWhenVanillaResetsThePaddlePhase() {
+        var track=new PaddleTrack();
+        for(int tick=0;tick<20;tick++)track.tick(true,tick*.3926991f);
+        float before=track.lean(19*.3926991f,1);
+        track.tick(false,0);
+        assertEquals(before,track.lean(0,0),1e-6,"No stop-phase reset snap");
+        float midpoint=track.lean(0,.5f);
+        for(int sample=0;sample<100;sample++)assertEquals(midpoint,track.lean(0,.5f));
+        for(int tick=0;tick<4;tick++)track.tick(false,0);
+        assertEquals(0,track.lean(0,1),1e-6);
+        track.tick(true,0);assertEquals(0,track.lean(0,0),1e-6,"Continuous restart");
+        track.tick(true,.3926991f);float restart=track.lean(.3926991f,1);
+        track.tick(false,0);assertEquals(restart,track.lean(0,0),1e-6,"Interrupted startup keeps its current spine pose");
+    }
+    @Test void shoulderRollKeepsExtendedReachesReachableWithoutStretchingOrDiscontinuity() {
+        var shoulder=new Vector3f(5,0,0);Vector3f previous=null;
+        for(int step=0;step<=440;step++) {
+            float distance=11+step*.005f;var target=new Vector3f(0,.8f,-.6f).mul(distance).add(shoulder);
+            var adjusted=ShoulderReach.adjust(shoulder,target,1);
+            assertTrue(adjusted.distance(shoulder)<=1.50001f,"Bounded shoulder movement");
+            assertTrue(adjusted.distance(target)<12,"Reach remains inside fixed-length arm envelope");
+            assertEquals(0,ShoulderReach.adjust(shoulder,target,0).distance(shoulder),1e-6,"Unowned/rest shoulder is unchanged");
+            if(previous!=null)assertTrue(previous.distance(adjusted)<.0051,"No threshold snap");
+            previous=adjusted;
+        }
+    }
     @Test void torsoCurveIsPeriodicWithContinuousWrapVelocity() {
         float wrap=(float)(Math.PI*2),epsilon=.0001f;
         assertEquals(StrokeProfile.lean(0),StrokeProfile.lean(wrap),1e-6);
@@ -106,7 +174,7 @@ class AnimationRegressionTest {
         float[] keys=StrokeProfile.validate(com.google.gson.JsonParser.parseString(valid).getAsJsonObject());
         StrokeProfile.apply(keys);keys[0]=.2f;
         assertEquals(.035f,StrokeProfile.lean(0),1e-6);
-        for(String invalid:new String[]{valid.replace("\"format\":1","\"format\":1.5"),valid.replace("0.085","0.3"),valid.replace("0.085","\"0.085\"")})
+        for(String invalid:new String[]{valid.replace("\"format\":1","\"format\":1.5"),valid.replace("0.085","0.4"),valid.replace("0.085","\"0.085\"")})
             assertThrows(IllegalArgumentException.class,()->StrokeProfile.validate(com.google.gson.JsonParser.parseString(invalid).getAsJsonObject()));
         assertThrows(IllegalArgumentException.class,()->StrokeProfile.apply(new float[]{Float.NaN}));
     }

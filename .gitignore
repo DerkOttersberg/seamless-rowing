@@ -6,3 +6,5 @@ qa-artifacts/
 .idea/
 logs/
 release-preview/
+.qa-motion-wsl/
+__pycache__/

@@ -17,7 +17,7 @@ public final class RowingArmorModel extends Model<RowingArmorModel.DrawState> {
         static PartPose of(ModelPart p) { return new PartPose(p.x,p.y,p.z,p.xRot,p.yRot,p.zRot,p.visible); }
         void apply(ModelPart p) { p.setPos(x,y,z);p.setRotation(rx,ry,rz);p.visible=visible; }
     }
-    public record DrawState(Map<String,PartPose> poses,ArmRigModel.Bone left,ArmRigModel.Bone right,boolean articulated,boolean firstPerson) {}
+    public record DrawState(Map<String,PartPose> poses,ArmRigModel.Bone left,ArmRigModel.Bone right,boolean articulated,boolean firstPerson,float lean,float twist) {}
     private final boolean articulated;
     public RowingArmorModel(HumanoidModel<?> original,boolean articulated) {
         super(copyRoot(original,articulated),RenderTypes::armorCutoutNoCull);
@@ -45,7 +45,7 @@ public final class RowingArmorModel extends Model<RowingArmorModel.DrawState> {
         if(handsOnly) poses.replaceAll((name,pose)->new PartPose(pose.x,pose.y,pose.z,pose.rx,pose.ry,pose.rz,
                 name.equals("left_arm")&&row.ownLeft() || name.equals("right_arm")&&row.ownRight()));
         return new DrawState(Map.copyOf(poses),articulated ? armPose(player.leftArm,row,true,transform,handsOnly) : null,
-                articulated ? armPose(player.rightArm,row,false,transform,handsOnly) : null,articulated,handsOnly);
+                articulated ? armPose(player.rightArm,row,false,transform,handsOnly) : null,articulated,handsOnly,row.lean(),row.twist());
     }
     private static ArmRigModel.Bone armPose(ModelPart arm,RowingPose row,boolean left,Matrix4f transform,boolean handsOnly) {
         if(row.owns(left)) return RowingArmLayer.solve(arm,row,left,transform,false);
@@ -56,6 +56,8 @@ public final class RowingArmorModel extends Model<RowingArmorModel.DrawState> {
     }
     @Override public void setupAnim(DrawState state) {
         state.poses.forEach((name,pose)->pose.apply(root.getChild(name)));
+        TorsoSurface.restore(root.getChild("body"));
+        TorsoSurface.apply(root.getChild("body"),state.lean,state.twist);
         if(state.articulated) {
             var left=root.getChild("left_arm");var right=root.getChild("right_arm");
             ArmRigModel.apply(left,left.getChild("lower"),state.left,state.firstPerson);

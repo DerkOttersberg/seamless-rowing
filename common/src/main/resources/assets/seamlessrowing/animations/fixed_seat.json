@@ -2,5 +2,5 @@
   "format": 1,
   "cycle_seconds": 0.8,
   "interpolation": "catmullrom",
-  "torso_pitch_radians": [0.035, 0.085, 0.045, -0.035, -0.075, -0.040, 0.0, 0.020]
+  "torso_pitch_radians": [0.09, 0.22, 0.13, -0.07, -0.20, -0.11, 0.0, 0.045]
 }
