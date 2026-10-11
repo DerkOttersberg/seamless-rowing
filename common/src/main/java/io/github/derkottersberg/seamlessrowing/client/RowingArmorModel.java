@@ -1,67 +1,51 @@
 package io.github.derkottersberg.seamlessrowing.client;
-
 import io.github.derkottersberg.seamlessrowing.mixin.ModelPartAccess;
-import net.minecraft.client.model.Model;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import java.util.*;
+import net.minecraft.client.player.AbstractClientPlayer;
+import com.mojang.blaze3d.vertex.*;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Quaternionf;
+import java.util.*;
 
-/** A draw snapshot for the native equipment pipeline, including its trims and glint. */
-public final class RowingArmorModel extends Model<RowingArmorModel.DrawState> {
-    public record PartPose(float x,float y,float z,float rx,float ry,float rz,boolean visible) {
-        static PartPose of(ModelPart p) { return new PartPose(p.x,p.y,p.z,p.xRot,p.yRot,p.zRot,p.visible); }
-        void apply(ModelPart p) { p.setPos(x,y,z);p.setRotation(rx,ry,rz);p.visible=visible; }
+/** Native armor/trim/glint passes use the same copied, articulated model. */
+public final class RowingArmorModel extends HumanoidModel<AbstractClientPlayer> {
+    public RowingArmorModel(HumanoidModel<?> source){super(root(source));}
+    private static ModelPart root(HumanoidModel<?> source){
+        var parts=new HashMap<String,ModelPart>();
+        parts.put("head",copy(source.head));parts.put("hat",copy(source.hat));parts.put("body",copy(source.body));
+        parts.put("left_leg",copy(source.leftLeg));parts.put("right_leg",copy(source.rightLeg));
+        parts.put("left_arm",ArmRigModel.arm(source.leftArm,new ModelPart(List.of(),Map.of())));
+        parts.put("right_arm",ArmRigModel.arm(source.rightArm,new ModelPart(List.of(),Map.of())));
+        return new ModelPart(List.of(),parts);
     }
-    public record DrawState(Map<String,PartPose> poses,ArmRigModel.Bone left,ArmRigModel.Bone right,boolean articulated,boolean firstPerson,float lean,float twist) {}
-    private final boolean articulated;
-    public RowingArmorModel(HumanoidModel<?> original,boolean articulated) {
-        super(copyRoot(original,articulated),RenderTypes::armorCutoutNoCull);
-        this.articulated=articulated;
+    private static ModelPart copy(ModelPart source){
+        var children=new HashMap<String,ModelPart>();((ModelPartAccess)(Object)source).rowingChildren().forEach((name,part)->children.put(name,copy(part)));
+        return new ModelPart(((ModelPartAccess)(Object)source).rowingCubes(),children);
     }
-    private static ModelPart copyRoot(HumanoidModel<?> source,boolean articulated) {
-        Map<String,ModelPart> parts=new HashMap<>();
-        ((ModelPartAccess)(Object)source.root()).rowingChildren().forEach((name,part)->parts.put(name,copy(part)));
-        if(articulated) {
-            parts.put("left_arm",ArmRigModel.arm(source.leftArm,new ModelPart(List.of(),Map.of())));
-            parts.put("right_arm",ArmRigModel.arm(source.rightArm,new ModelPart(List.of(),Map.of())));
+    @Override public void renderToBuffer(PoseStack stack,VertexConsumer consumer,int light,int overlay,int color){
+        var context=RenderContext.current();
+        if(context!=null&&context.rowingPose()!=null){
+            var renderer=net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(context.player);
+            if(renderer instanceof net.minecraft.client.renderer.entity.player.PlayerRenderer playerRenderer){
+                PlayerModel<?> player=playerRenderer.getModel();var row=context.rowingPose();
+                body.copyFrom(player.body);head.copyFrom(player.head);hat.copyFrom(player.hat);
+                TorsoSurface.restore(body);TorsoSurface.apply(body,row.lean(),row.twist());
+                var transform=new Matrix4f(stack.last().pose()).invert().mul(context.rowingBase());
+                boolean visibleLeft=leftArm.visible,visibleRight=rightArm.visible;
+                var l=bone(player.leftArm,row,true,transform,context.rowingHandsOnly());var r=bone(player.rightArm,row,false,transform,context.rowingHandsOnly());
+                ArmRigModel.apply(leftArm,leftArm.getChild("lower"),new ArmRigModel.Bone(l.shoulder(),l.upper(),l.lower(),visibleLeft&&l.visible(),false),context.rowingHandsOnly());
+                ArmRigModel.apply(rightArm,rightArm.getChild("lower"),new ArmRigModel.Bone(r.shoulder(),r.upper(),r.lower(),visibleRight&&r.visible(),false),context.rowingHandsOnly());
+                if(context.rowingHandsOnly()){head.visible=hat.visible=body.visible=leftLeg.visible=rightLeg.visible=false;}
+            }
         }
-        return new ModelPart(List.of(),Map.copyOf(parts));
+        super.renderToBuffer(stack,consumer,light,overlay,color);
     }
-    private static ModelPart copy(ModelPart source) {
-        Map<String,ModelPart> children=new HashMap<>();
-        ((ModelPartAccess)(Object)source).rowingChildren().forEach((name,part)->children.put(name,copy(part)));
-        return new ModelPart(((ModelPartAccess)(Object)source).rowingCubes(),Map.copyOf(children));
-    }
-    public DrawState capture(HumanoidModel<?> original,PlayerModel player,RowingPose row,Matrix4f transform,boolean handsOnly) {
-        Map<String,PartPose> poses=new HashMap<>();
-        ((ModelPartAccess)(Object)original.root()).rowingChildren().forEach((name,part)->poses.put(name,PartPose.of(part)));
-        poses.put("body",PartPose.of(player.body)); poses.put("head",PartPose.of(player.head));
-        if(!articulated) { poses.put("left_arm",PartPose.of(player.leftArm));poses.put("right_arm",PartPose.of(player.rightArm)); }
-        if(handsOnly) poses.replaceAll((name,pose)->new PartPose(pose.x,pose.y,pose.z,pose.rx,pose.ry,pose.rz,
-                name.equals("left_arm")&&row.ownLeft() || name.equals("right_arm")&&row.ownRight()));
-        return new DrawState(Map.copyOf(poses),articulated ? armPose(player.leftArm,row,true,transform,handsOnly) : null,
-                articulated ? armPose(player.rightArm,row,false,transform,handsOnly) : null,articulated,handsOnly,row.lean(),row.twist());
-    }
-    private static ArmRigModel.Bone armPose(ModelPart arm,RowingPose row,boolean left,Matrix4f transform,boolean handsOnly) {
-        if(row.owns(left)) return RowingArmLayer.solve(arm,row,left,transform,false);
-        var cube=((ModelPartAccess)(Object)arm).rowingCubes().getFirst();
-        var rotation=new Quaternionf().rotationZYX(arm.zRot,arm.yRot,arm.xRot);
-        var shoulder=rotation.transform(new Vector3f((cube.minX+cube.maxX)/2,-2,0)).add(arm.x,arm.y,arm.z);
-        return new ArmRigModel.Bone(shoulder,rotation,new Quaternionf(),!handsOnly&&arm.visible,false);
-    }
-    @Override public void setupAnim(DrawState state) {
-        state.poses.forEach((name,pose)->pose.apply(root.getChild(name)));
-        TorsoSurface.restore(root.getChild("body"));
-        TorsoSurface.apply(root.getChild("body"),state.lean,state.twist);
-        if(state.articulated) {
-            var left=root.getChild("left_arm");var right=root.getChild("right_arm");
-            ArmRigModel.apply(left,left.getChild("lower"),state.left,state.firstPerson);
-            ArmRigModel.apply(right,right.getChild("lower"),state.right,state.firstPerson);
-        }
+    private static ArmRigModel.Bone bone(ModelPart arm,RowingPose row,boolean left,Matrix4f transform,boolean hands) {
+        if(row.owns(left))return RowingArmLayer.solve(arm,row,left,transform,false);
+        var cube=((ModelPartAccess)(Object)arm).rowingCubes().get(0);
+        var rotation=new org.joml.Quaternionf().rotationZYX(arm.zRot,arm.yRot,arm.xRot);
+        var shoulder=rotation.transform(new org.joml.Vector3f((cube.minX+cube.maxX)*.5f,-2,0)).add(arm.x,arm.y,arm.z);
+        return new ArmRigModel.Bone(shoulder,rotation,new org.joml.Quaternionf(),!hands,false);
     }
 }

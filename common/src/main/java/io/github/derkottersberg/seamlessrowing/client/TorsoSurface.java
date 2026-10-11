@@ -13,10 +13,10 @@ public final class TorsoSurface {
     public static boolean supported(ModelPart part) {
         var access=(ModelPartAccess)(Object)part;var binding=BINDINGS.get(part);
         var cubes=binding==null?access.rowingCubes():binding.original;
-        if(cubes.size()!=1)return false;var cube=cubes.getFirst();
+        if(cubes.size()!=1)return false;var cube=cubes.get(0);
         return Math.abs(cube.minY)<.01 && Math.abs(cube.maxY-12)<.01
                 && Math.abs(cube.maxX-cube.minX-8)<.01 && Math.abs(cube.maxZ-cube.minZ-4)<.01
-                && cube.polygons.length==6 && Arrays.stream(cube.polygons).allMatch(p->p!=null&&p.vertices().length==4);
+                && cube.polygons.length==6 && Arrays.stream(cube.polygons).allMatch(p->p!=null&&p.vertices.length==4);
     }
     public static void restore(ModelPart part) {
         var binding=BINDINGS.get(part);

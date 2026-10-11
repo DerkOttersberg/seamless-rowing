@@ -8,16 +8,17 @@
     "FrameProbe",
     "SubmittedArmProbe",
     "NativePaddleProbe",
+    "NativeRaftProbe",
     "RenderedPaddleProbe",
     "EmfPaddleTransformProbe",
     "RealCameraCaptureProbe",
     "SkinProbe",
     "PaddleSoundProbe",
     "ShutdownProbe",
-    "BodySurfaceProbe",
-    "SubmittedBoatProbe"
+    "BodySurfaceProbe"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "refmap": "rowing-qa.refmap.json"
 }

@@ -2,7 +2,7 @@ package qa.rowing;
 
 import io.github.derkottersberg.seamlessrowing.client.RowingClient;
 import net.minecraft.client.*;
-import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.entity.vehicle.Boat;
 import java.nio.file.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -18,11 +18,11 @@ public final class LifecycleScenario {
         if(tick>=60&&reload!=null&&!reload.isDone()) {tick=59;return;}
         if(tick==65) {reload.join();check(RowingClient.capture(mc.player,1,false)!=null,"No recovery after resource reload");assertions++;}
         if(tick==72) {
-            var boat=(AbstractBoat)mc.player.getVehicle();boat.setHurtTime(9);boat.setDamage(5);boat.setHurtDir(1);
+            var boat=(Boat)mc.player.getVehicle();boat.setHurtTime(9);boat.setDamage(5);boat.setHurtDir(1);
         }
-        if(tick%2==0&&tick>66&&tick<86) Screenshot.grab(mc.gameDirectory,"wobble-"+tick+".png",mc.gameRenderer.mainRenderTarget(),1,m->{});
+        if(tick%2==0&&tick>66&&tick<86) Screenshot.grab(mc.gameDirectory,"wobble-"+tick+".png",mc.getMainRenderTarget(),m->{});
         if(tick==110) {
-            var boat=(AbstractBoat)mc.player.getVehicle();
+            var boat=(Boat)mc.player.getVehicle();
             System.out.println("ROWING_STOP_NATIVE left="+boat.getPaddleState(0)+" right="+boat.getPaddleState(1)+" up="+mc.options.keyUp.isDown());
             check(RowingClient.capture(mc.player,1,false)==null,"Stopped boat retained pose");assertions++;
         }

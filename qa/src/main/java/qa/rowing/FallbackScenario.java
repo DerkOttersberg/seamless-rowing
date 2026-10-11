@@ -15,7 +15,7 @@ public final class FallbackScenario {
             var third=RowingClient.capture(mc.player,1,false);
             if(third!=null&&!third.articulated())rigid++;
         }
-        if(tick==35||tick==65) Screenshot.grab(mc.gameDirectory,"fallback-"+tick+".png",mc.gameRenderer.mainRenderTarget(),1,m->{});
+        if(tick==35||tick==65) Screenshot.grab(mc.gameDirectory,"fallback-"+tick+".png",mc.getMainRenderTarget(),m->{});
         if(tick==100) {
             try {Files.writeString(mc.gameDirectory.toPath().resolve("rowing-fallback.json"),"{\"pass\":"+(rigid>0)+",\"rigidTicks\":"+rigid+",\"preservedFirstPersonOverlay\":true}");}
             catch(Exception failure){throw new RuntimeException(failure);}

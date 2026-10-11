@@ -14,14 +14,14 @@ public final class SettingsScenario {
         int stage=(tick-1)/40,local=(tick-1)%40;
         if(stage<3) {
             if(local==0) {
-                mc.options.guiScale().set(new int[]{1,2,4}[stage]);mc.resizeGui();
-                mc.setScreenAndShow(new RowingSettingsScreen(null));
+                mc.options.guiScale().set(new int[]{1,2,4}[stage]);mc.resizeDisplay();
+                mc.setScreen(new RowingSettingsScreen(null));
             }
-            if(local==12) Screenshot.grab(mc.gameDirectory,"settings-scale-"+new int[]{1,2,4}[stage]+".png",mc.gameRenderer.mainRenderTarget(),1,message->{});
+            if(local==12) Screenshot.grab(mc.gameDirectory,"settings-scale-"+new int[]{1,2,4}[stage]+".png",mc.getMainRenderTarget(),message->{});
             if(local==15) press(mc,"Rowing animation");
             if(local==20) {press(mc,"Cancel");check(RowingClient.settings().enabled(),"Cancel changed runtime settings");passed++;}
-            if(local==25) {mc.setScreenAndShow(new RowingSettingsScreen(null));press(mc,"Rowing animation");press(mc,"Save");check(!RowingClient.settings().enabled(),"Save ignored draft");passed++;}
-            if(local==30) {mc.setScreenAndShow(new RowingSettingsScreen(null));press(mc,"Reset");press(mc,"Save");check(RowingClient.settings().equals(ClientSettings.DEFAULT),"Reset ignored");passed++;}
+            if(local==25) {mc.setScreen(new RowingSettingsScreen(null));press(mc,"Rowing animation");press(mc,"Save");check(!RowingClient.settings().enabled(),"Save ignored draft");passed++;}
+            if(local==30) {mc.setScreen(new RowingSettingsScreen(null));press(mc,"Reset");press(mc,"Save");check(RowingClient.settings().equals(ClientSettings.DEFAULT),"Reset ignored");passed++;}
         } else if(tick==121) {
             try {
                 check(Files.exists(RowingClient.configPath().resolveSibling("seamless-rowing.json.bak")),"Missing backup");
@@ -32,9 +32,9 @@ public final class SettingsScenario {
         }
     }
     private static void press(Minecraft mc,String label) {
-        var screen=mc.gui.screen();check(screen instanceof RowingSettingsScreen,"Wrong screen");
+        var screen=mc.screen;check(screen instanceof RowingSettingsScreen,"Wrong screen");
         Button button=screen.children().stream().filter(c->c instanceof Button b&&b.getMessage().getString().startsWith(label)).map(c->(Button)c).findFirst().orElseThrow(()->new IllegalStateException("Missing button "+label));
-        button.onPress(null);
+        button.onPress();
     }
     private static void check(boolean condition,String failure){if(!condition)throw new IllegalStateException(failure);}
 }

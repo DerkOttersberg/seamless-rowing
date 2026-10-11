@@ -7,10 +7,10 @@ import org.joml.*;
 import java.lang.Math;
 
 public record VanillaPaddleGeometry(boolean raft) implements PaddleGeometry {
-    public boolean matches(net.minecraft.world.entity.vehicle.boat.AbstractBoat boat,EntityRenderer<?,?> renderer) {
+    public boolean matches(net.minecraft.world.entity.vehicle.Boat boat,EntityRenderer<?> renderer) {
         // A modded entity may change its seat while reusing a native renderer. It needs a verified adapter.
         return net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(boat.getType()).getNamespace().equals("minecraft")
-                && renderer.getClass()==(raft ? RaftRenderer.class : BoatRenderer.class);
+                && renderer.getClass()==BoatRenderer.class && (boat.getVariant()==net.minecraft.world.entity.vehicle.Boat.Type.BAMBOO)==raft;
     }
     public Vec3 grip(Matrix4f boat,PaddlePose pose,boolean right) {
         Quaternionf paddle=new Quaternionf().rotationZYX(.19634955f,right ? (float)Math.PI-pose.yaw() : pose.yaw(),pose.pitch());

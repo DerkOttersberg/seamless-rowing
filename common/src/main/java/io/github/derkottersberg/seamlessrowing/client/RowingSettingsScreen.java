@@ -2,7 +2,7 @@ package io.github.derkottersberg.seamlessrowing.client;
 
 import io.github.derkottersberg.seamlessrowing.config.ClientSettings;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import java.io.IOException;
@@ -33,12 +33,12 @@ public final class RowingSettingsScreen extends Screen {
             try { RowingClient.save(draft); onClose(); } catch(IOException failure) { error="Could not save; settings remain unchanged."; }
         }).bounds(footerX+2*(footerWidth+6),bottom,footerWidth,20).build());
     }
-    @Override public void extractRenderState(GuiGraphicsExtractor graphics,int mouseX,int mouseY,float partial) {
-        super.extractRenderState(graphics,mouseX,mouseY,partial);
-        graphics.centeredText(font,title,width/2,18,0xFFFFFFFF);
-        graphics.centeredText(font,Component.translatable("seamlessrowing.settings.scope"),width/2,34,0xFFB9C9D2);
-        graphics.textWithWordWrap(font,Component.literal(error.isEmpty()?RowingClient.compatibilityStatus():error),
+    @Override public void render(GuiGraphics graphics,int mouseX,int mouseY,float partial) {
+        super.render(graphics,mouseX,mouseY,partial);
+        graphics.drawCenteredString(font,title,width/2,18,0xFFFFFFFF);
+        graphics.drawCenteredString(font,Component.translatable("seamlessrowing.settings.scope"),width/2,34,0xFFB9C9D2);
+        graphics.drawWordWrap(font,Component.literal(error.isEmpty()?RowingClient.compatibilityStatus():error),
                 Math.max(8,(width-300)/2),height-(height<250?56:66),Math.min(300,width-16),error.isEmpty()?0xFFB9C9D2:0xFFFF8888);
     }
-    @Override public void onClose() { minecraft.setScreenAndShow(parent); }
+    @Override public void onClose() { minecraft.setScreen(parent); }
 }

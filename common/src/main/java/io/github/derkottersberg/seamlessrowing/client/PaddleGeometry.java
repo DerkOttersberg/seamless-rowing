@@ -7,7 +7,7 @@ import org.joml.Matrix4f;
 
 /** Explicit geometry adapter. An unrecognized renderer never acquires rowing visuals. */
 public interface PaddleGeometry {
-    boolean matches(net.minecraft.world.entity.vehicle.boat.AbstractBoat boat,EntityRenderer<?,?> renderer);
+    boolean matches(net.minecraft.world.entity.vehicle.Boat boat,EntityRenderer<?> renderer);
     Vec3 grip(Matrix4f renderedBoatTransform,PaddlePose pose,boolean right);
     Vec3 shaft(Matrix4f renderedBoatTransform,PaddlePose pose,boolean right);
 }

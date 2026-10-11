@@ -1,9 +1,9 @@
 package qa.rowing;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.model.PlayerModel;
 import io.github.derkottersberg.seamlessrowing.client.RowingState;
-import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+
 import traben.entity_model_features.models.IEMFModel;
 import java.nio.file.Files;
 import java.util.Map;
@@ -16,11 +16,11 @@ public final class FreshProbe {
         return root!=null&&root.containsCustomModel&&root.currentModelVariant!=0;
     }
     private static int rowing,wrongRowingVariant,customOutside,vanillaOutside;
-    public static void inspect(PlayerModel model,AvatarRenderState state) {
+    public static void inspect(PlayerModel model,io.github.derkottersberg.seamlessrowing.client.RenderContext state) {
         if(!((Object)model instanceof IEMFModel emf))return;
         var root=emf.emf$getEMFRootModel();
         if(root==null||!root.containsCustomModel)return;
-        if(((RowingState)state).rowingPose()!=null) {
+        if(state!=null&&state.rowingPose()!=null) {
             rowing++;if(root.currentModelVariant!=0)wrongRowingVariant++;
         } else if(root.currentModelVariant!=0)customOutside++;
         else vanillaOutside++;

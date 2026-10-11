@@ -18,17 +18,17 @@ public final class SurfaceGeometry {
     private static final Map<ModelPart,Boolean> relocatedHeads=new WeakHashMap<>();
     private static int inflatedEquipmentBodies;
     private static int hiddenBodySamples,relocatedHeadSamples,changedHiddenHeads;
-    public static void source(net.minecraft.client.model.player.PlayerModel model) {
+    public static void source(net.minecraft.client.model.PlayerModel model) {
         var cubes=((ModelPartAccess)(Object)model.body).rowingCubes();
         if(cubes.size()!=1)return;
         float min=Float.POSITIVE_INFINITY,max=Float.NEGATIVE_INFINITY;
-        for(var face:cubes.getFirst().polygons)for(var v:face.vertices()){min=Math.min(min,v.y());max=Math.max(max,v.y());}
+        for(var face:cubes.getFirst().polygons)for(var v:face.vertices){min=Math.min(min,v.pos.y);max=Math.max(max,v.pos.y);}
         boolean skin=Math.abs(min)<.01&&Math.abs(max-12)<.01;
         if(!skin&&!skinBodies.containsKey(model.body))System.out.println("NATIVE_INFLATED_EQUIPMENT_BODY minY="+min+" maxY="+max);
         skinBodies.put(model.body,skin);
         relocatedHeads.put(model.body,Math.abs(model.head.y)>1000);
     }
-    public static void body(net.minecraft.client.model.player.PlayerModel model,io.github.derkottersberg.seamlessrowing.client.RowingPose row) {
+    public static void body(net.minecraft.client.model.PlayerModel model,io.github.derkottersberg.seamlessrowing.client.RowingPose row) {
         var cubes=((ModelPartAccess)(Object)model.body).rowingCubes();
         if(row==null&&qa.rowing.QaPlatform.isModLoaded("entity_model_features")&&FreshProbe.customVariant(model)) {
             // EMF's custom variant attaches geometry to children of the native body slot.
@@ -48,8 +48,8 @@ public final class SurfaceGeometry {
         if(cubes.size()<2)return;
         var neck=new Vector3f(model.head.x-model.body.x,model.head.y-model.body.y,model.head.z-model.body.z);
         double nearest=Double.POSITIVE_INFINITY;
-        for(var face:cubes.getLast().polygons) if(face.vertices().length==4) {
-            var center=new Vector3f();for(var v:face.vertices())center.add(v.x(),v.y(),v.z());center.mul(.25f);
+        for(var face:cubes.getLast().polygons) if(face.vertices.length==4) {
+            var center=new Vector3f();for(var v:face.vertices)center.add(v.pos.x,v.pos.y,v.pos.z);center.mul(.25f);
             nearest=Math.min(nearest,center.distance(neck));
         }
         bodySamples++;neckError=Math.max(neckError,nearest);
@@ -64,11 +64,11 @@ public final class SurfaceGeometry {
         for(int i=0;i<cubes.size()-1;i++) {
             Set<String> ring=new HashSet<>();
             for(var face:cubes.get(i).polygons) {
-                if(face.vertices().length==0)continue;
-                if(face.vertices().length!=4 || !Float.isFinite(face.normal().x()+face.normal().y()+face.normal().z())) invalidFaces++;
-                for(var v:face.vertices()) {
-                    if(!Float.isFinite(v.x()+v.y()+v.z())) invalidFaces++;
-                    ring.add(Math.round(v.x()*100000)+","+Math.round(v.y()*100000)+","+Math.round(v.z()*100000));
+                if(face.vertices.length==0)continue;
+                if(face.vertices.length!=4 || !Float.isFinite(face.normal.x()+face.normal.y()+face.normal.z())) invalidFaces++;
+                for(var v:face.vertices) {
+                    if(!Float.isFinite(v.pos.x+v.pos.y+v.pos.z)) invalidFaces++;
+                    ring.add(Math.round(v.pos.x*100000)+","+Math.round(v.pos.y*100000)+","+Math.round(v.pos.z*100000));
                 }
             }
             if(previous!=null) {var shared=new HashSet<>(previous);shared.retainAll(ring);if(shared.size()!=4)brokenRings++;}
@@ -77,8 +77,8 @@ public final class SurfaceGeometry {
         var marker=new com.mojang.blaze3d.vertex.PoseStack();lower.translateAndRotate(marker);
         var wrist=marker.last().pose().transformPosition(new Vector3f(0,6f/16,0)).mul(16);
         double nearest=Double.POSITIVE_INFINITY;
-        for(var face:cubes.getLast().polygons) if(face.vertices().length==4) {
-            var center=new Vector3f();for(var v:face.vertices())center.add(v.x(),v.y(),v.z());center.mul(.25f);
+        for(var face:cubes.getLast().polygons) if(face.vertices.length==4) {
+            var center=new Vector3f();for(var v:face.vertices)center.add(v.pos.x,v.pos.y,v.pos.z);center.mul(.25f);
             nearest=Math.min(nearest,center.distance(wrist));
         }
         wristError=Math.max(wristError,nearest);samples++;

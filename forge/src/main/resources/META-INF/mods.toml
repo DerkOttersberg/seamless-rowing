@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[66,)"
+loaderVersion="[52,)"
 license="All Rights Reserved"
 issueTrackerURL="https://github.com/DerkOttersberg/seamless-rowing/issues"
 clientSideOnly=true
@@ -17,16 +17,16 @@ config="seamlessrowing.mixins.json"
 config="seamlessrowing.compat.mixins.json"
 
 [features.seamlessrowing]
-javaVersion="[25,)"
+javaVersion="[21,)"
 [[dependencies.seamlessrowing]]
 modId="forge"
 mandatory=true
-versionRange="[66.0.9,67)"
+versionRange="[52.1.16,53)"
 ordering="NONE"
 side="CLIENT"
 [[dependencies.seamlessrowing]]
 modId="minecraft"
 mandatory=true
-versionRange="[26.3]"
+versionRange="[1.21.1]"
 ordering="NONE"
 side="CLIENT"

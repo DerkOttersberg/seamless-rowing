@@ -12,7 +12,7 @@ public final class FreshScenario {
     private static int tick,owned,useReleased,stopped,walking,realCameraTicks;private static boolean reloadDone;
     private static java.util.concurrent.CompletableFuture<Void> reload;
     public static void tick(Minecraft mc) {
-        if(mc.isPaused()||mc.gui.screen()!=null||mc.player==null||mc.level==null)return;
+        if(mc.isPaused()||mc.screen!=null||mc.player==null||mc.level==null)return;
         if(tick==0&&mc.player.getVehicle()==null)return;
         tick++;
         if(tick==1&&Boolean.getBoolean("qa.rowing.realcamera"))com.xtracr.realcamera.config.ConfigFile.config().enabled=true;
@@ -42,10 +42,10 @@ public final class FreshScenario {
             var server=mc.getSingleplayerServer();var level=server.overworld();
             for(int x=-4;x<=8;x++)for(int z=-3;z<=8;z++)level.setBlock(new BlockPos(x,-58,z),Blocks.OAK_PLANKS.defaultBlockState(),2);
             var player=server.getPlayerList().getPlayerByName("RowQA");player.stopRiding();
-            player.teleportTo(level,-3,-57,1,Set.of(),0,0,true);
+            player.teleportTo(level,-3,-57,1,Set.of(),0,0);
         });
         if(tick>225&&mc.player.getVehicle()==null&&pose==null)walking++;
-        if(tick%2==0)Screenshot.grab(mc.gameDirectory,String.format("fresh-%03d.png",tick),mc.gameRenderer.mainRenderTarget(),1,message->{});
+        if(tick%2==0)Screenshot.grab(mc.gameDirectory,String.format("fresh-%03d.png",tick),mc.getMainRenderTarget(),message->{});
         if(tick==275) {
             mc.options.keyUp.setDown(false);mc.options.keyUse.setDown(false);mc.options.keyLeft.setDown(false);
             boolean pass=owned>40&&useReleased>3&&stopped>5&&walking>20&&reloadDone&&FrameContact.samples()>10&&FrameContact.maximum()<=1

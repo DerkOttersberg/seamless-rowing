@@ -3,8 +3,23 @@
   "minVersion": "0.8",
   "package": "io.github.derkottersberg.seamlessrowing.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": ["ModelPartAccess", "AvatarStateMixin", "BoatStateMixin", "LivingRendererAccess",
-    "AvatarRendererMixin", "LivingRendererMixin", "PlayerModelMixin", "BoatModelMixin", "BoatRendererMixin",
-    "HandsStateMixin", "HandsExtractMixin", "HandsRendererMixin", "HeldItemLayerMixin", "ArmorLayerMixin"],
-  "injectors": {"defaultRequire": 1}
+  "client": [
+    "ModelPartAccess",
+    "PolygonAccess",
+    "LivingRendererAccess",
+    "PlayerRendererMixin",
+    "PlayerModelMixin",
+    "BoatModelMixin",
+    "BoatRendererMixin",
+    "HandsRendererMixin",
+    "HeldItemLayerMixin",
+    "ArmorLayerMixin",
+    "RaftModelMixin",
+    "FirstPersonLayersMixin",
+    "FirstPersonNameMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "seamlessrowing.refmap.json"
 }

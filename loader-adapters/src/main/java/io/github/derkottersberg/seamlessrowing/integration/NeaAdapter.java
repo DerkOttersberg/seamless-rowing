@@ -4,7 +4,7 @@ import dev.tr7zw.notenoughanimations.api.*;
 import dev.tr7zw.notenoughanimations.access.PlayerData;
 import dev.tr7zw.notenoughanimations.versionless.animations.BodyPart;
 import io.github.derkottersberg.seamlessrowing.client.*;
-import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.Minecraft;
 

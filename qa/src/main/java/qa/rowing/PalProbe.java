@@ -14,6 +14,6 @@ public final class PalProbe implements IAnimation {
         layer.active=active;
     }
     public boolean isActive(){return active;}
-    public void get3DTransform(PlayerAnimBone bone){if(active&&bone.name.equals("left_arm"))bone.rotation.z+=.08f;}
+    public PlayerAnimBone get3DTransform(PlayerAnimBone bone){if(active&&bone.getName().equals("left_arm"))bone.rotZ+=.08f;return bone;}
     public boolean canRemove(){return false;}
 }

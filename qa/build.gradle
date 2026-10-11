@@ -1,7 +1,13 @@
+plugins { id 'dev.architectury.loom' }
 dependencies {
-    compileOnly project(':common')
+    minecraft libs.minecraft
+    mappings loom.officialMojangMappings()
+    modImplementation libs.fabric.loader
+    modImplementation libs.fabric.api
     compileOnly project(':fabric')
-    compileOnly libs.mixin
+    compileOnly project(':common')
 }
 sourceSets.main.compileClasspath += project(':fabric').sourceSets.main.compileClasspath
-tasks.named('jar') { archiveFileName = 'seamless-rowing-qa.jar' }
+loom { accessWidenerPath=rootProject.file('common/src/main/resources/seamlessrowing.accesswidener'); mixin { useLegacyMixinAp=true; defaultRefmapName='rowing-qa.refmap.json' }; mods { rowingqa { sourceSet sourceSets.main } } }
+tasks.named('jar') { archiveFileName='seamless-rowing-qa-dev.jar'; manifest { attributes 'MixinConfigs':'rowing-qa.mixins.json' } }
+tasks.named('remapJar') { archiveFileName='seamless-rowing-qa.jar' }

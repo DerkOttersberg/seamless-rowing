@@ -8,9 +8,11 @@ import net.minecraftforge.fml.ModList;
 public final class QaForge {
     public QaForge(FMLJavaModLoadingContext context) {
         if(FMLEnvironment.dist.isClient()) {
-            QaPlatform.initialize(ModList::isLoaded);
+            QaPlatform.initialize(ModList.get()::isLoaded);
             var program=new RowingQaClient();program.initialize();
-            net.minecraftforge.event.TickEvent.ClientTickEvent.Post.BUS.addListener(event->program.tick(net.minecraft.client.Minecraft.getInstance()));
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.event.TickEvent.ClientTickEvent event)->{
+                if(event.phase==net.minecraftforge.event.TickEvent.Phase.END)program.tick(net.minecraft.client.Minecraft.getInstance());
+            });
         }
     }
 }

@@ -1,4 +1,4 @@
-plugins { id 'dev.architectury.loom-no-remap' }
+plugins { id 'dev.architectury.loom' }
 sourceSets.main {
     java.srcDir rootProject.file('common/src/main/java')
     java.srcDir rootProject.file('loader-adapters/src/main/java')
@@ -6,26 +6,28 @@ sourceSets.main {
 }
 dependencies {
     minecraft libs.minecraft
+    mappings loom.officialMojangMappings()
     neoForge libs.neoforge
-    compileOnly 'maven.modrinth:entity-model-features:N7d5LddE'
-    compileOnly 'maven.modrinth:entitytexturefeatures:O8J3sxxp'
-    compileOnly 'maven.modrinth:real-camera:ROhlZqcT'
-    compileOnly('tr7zw:FirstPersonModel:2.7.3') { artifact { name = 'firstperson-fabric'; type = 'jar' } }
-    compileOnly('tr7zw:NotEnoughAnimations:1.12.5') { artifact { name = 'notenoughanimations-fabric'; type = 'jar' } }
-    compileOnly('com.zigythebird:PlayerAnimationLibrary:1.2.8') { artifact { name = 'PlayerAnimationLibMerged'; type = 'jar' } }
+    modCompileOnly('maven.modrinth:entity-model-features:bRlX1x4e') { transitive=false }
+    modCompileOnly('maven.modrinth:entitytexturefeatures:CfQJbv1u') { transitive=false }
+    modCompileOnly('maven.modrinth:first-person-model:eaj8cYpD') { transitive=false }
+    modCompileOnly('maven.modrinth:not-enough-animations:VCuMsK45') { transitive=false }
+    modCompileOnly('maven.modrinth:real-camera:j9j0EChP') { transitive=false }
+    modCompileOnly('maven.modrinth:player-animation-library:yjxtkvnD') { transitive=false }
+    modCompileOnly('maven.modrinth:playeranimator:HJZB6bmA') { transitive=false }
 }
-loom { mods { seamlessrowing { sourceSet sourceSets.main } } }
-processResources {
-    inputs.property 'version', project.version
-    filesMatching('META-INF/neoforge.mods.toml') { expand version: project.version }
+loom {
+    accessWidenerPath=rootProject.file('common/src/main/resources/seamlessrowing.accesswidener')
+    mixin { useLegacyMixinAp=true; defaultRefmapName='seamlessrowing.refmap.json' }
+    mods { seamlessrowing { sourceSet sourceSets.main } }
 }
+loom.getNeoForge().convertAccessWideners(tasks.named('remapJar'), 'seamlessrowing.accesswidener')
+processResources { inputs.property 'version',project.version; filesMatching('META-INF/neoforge.mods.toml') { expand version:project.version } }
 tasks.named('jar') {
     from rootProject.file('LICENSE')
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    manifest { attributes 'Automatic-Module-Name': 'io.github.derkottersberg.seamlessrowing', 'MixinConfigs': 'seamlessrowing.mixins.json,seamlessrowing.compat.mixins.json' }
-    archiveFileName = "${rootProject.archives_base_name}-${project.version}-neoforge.jar"
+    duplicatesStrategy=DuplicatesStrategy.EXCLUDE
+    manifest { attributes 'MixinConfigs':'seamlessrowing.mixins.json,seamlessrowing.compat.mixins.json' }
+    archiveFileName="${rootProject.archives_base_name}-${project.version}-neoforge-dev.jar"
 }
-tasks.named('sourcesJar') {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    archiveFileName = "${rootProject.archives_base_name}-${project.version}-neoforge-sources.jar"
-}
+tasks.named('remapJar') { archiveFileName="${rootProject.archives_base_name}-${project.version}-neoforge.jar" }
+tasks.named('remapSourcesJar') { archiveFileName="${rootProject.archives_base_name}-${project.version}-neoforge-sources.jar" }

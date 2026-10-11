@@ -2,14 +2,14 @@ package io.github.derkottersberg.seamlessrowing.client;
 
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.player.PlayerModel;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.renderer.RenderType;
 import org.joml.*;
 import java.lang.Math;
 import java.util.*;
 import io.github.derkottersberg.seamlessrowing.math.ArmSurface;
 
-public final class ArmRigModel extends Model<ArmRigModel.DrawState> {
+public final class ArmRigModel extends Model {
     public record Bone(Vector3f shoulder,Quaternionf upper,Quaternionf lower,boolean visible,boolean sleeve) {
         public Bone { shoulder=new Vector3f(shoulder);upper=new Quaternionf(upper);lower=new Quaternionf(lower); }
         @Override public Vector3f shoulder() { return new Vector3f(shoulder); }
@@ -17,18 +17,21 @@ public final class ArmRigModel extends Model<ArmRigModel.DrawState> {
         @Override public Quaternionf lower() { return new Quaternionf(lower); }
     }
     public record DrawState(Bone left,Bone right,boolean firstPerson) {}
-    private final ModelPart left,right,leftLower,rightLower;
+    private final ModelPart root,left,right,leftLower,rightLower;
     private static final Map<ModelPart,TexturedSurface> SURFACES=new WeakHashMap<>();
     public ArmRigModel(PlayerModel model) {
-        super(root(model),RenderTypes::entityCutout);
+        super(RenderType::entityCutoutNoCull);
+        root=root(model);
         left=root.getChild("left"); right=root.getChild("right");
         leftLower=left.getChild("lower"); rightLower=right.getChild("lower");
     }
+    public ModelPart root(){return root;}
+    @Override public void renderToBuffer(com.mojang.blaze3d.vertex.PoseStack stack,com.mojang.blaze3d.vertex.VertexConsumer consumer,int light,int overlay,int color){root.render(stack,consumer,light,overlay,color);}
     private static ModelPart root(PlayerModel model) {
         return new ModelPart(List.of(),Map.of("left",arm(model.leftArm,model.leftSleeve),"right",arm(model.rightArm,model.rightSleeve)));
     }
     public static ModelPart arm(ModelPart source,ModelPart sleeve) {
-        var cube=((io.github.derkottersberg.seamlessrowing.mixin.ModelPartAccess)(Object)source).rowingCubes().getFirst();
+        var cube=((io.github.derkottersberg.seamlessrowing.mixin.ModelPartAccess)(Object)source).rowingCubes().get(0);
         float center=(cube.minX+cube.maxX)*.5f;
         ModelPart upperSleeve=surface(sleeve,center,Float.NEGATIVE_INFINITY);
         // Empty joint marker retained for native contact probes and equipment snapshots.
@@ -45,7 +48,7 @@ public final class ArmRigModel extends Model<ArmRigModel.DrawState> {
         var mesh=new TexturedSurface(source,center,2,.5f,cutoff);
         var part=new ModelPart(mesh.cubes(),Map.of());SURFACES.put(part,mesh);return part;
     }
-    @Override public void setupAnim(DrawState state) {
+    public void setupAnim(DrawState state) {
         apply(left,leftLower,state.left,state.firstPerson); apply(right,rightLower,state.right,state.firstPerson);
     }
     public static void apply(ModelPart upper,ModelPart lower,Bone bone,boolean firstPerson) {

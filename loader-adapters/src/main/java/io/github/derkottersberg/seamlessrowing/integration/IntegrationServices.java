@@ -4,14 +4,14 @@ import io.github.derkottersberg.seamlessrowing.internal.ClientPlatformServices;
 /** Explicitly constructed by each loader, with no reflective discovery or runtime framework. */
 public abstract class IntegrationServices implements ClientPlatformServices {
 
-    private boolean initialized,nea,pal,unsupported;
+    private boolean initialized,nea,pal,playerAnimator,unsupported;
     private String status="Compatibility is local to this client.";
     public final void integrations() {
         if(initialized)return;initialized=true;
         try {
             if(isModLoaded("punchy")&&!modVersion("punchy").equals("2.8e"))unsupported=true;
             if(isModLoaded("realcamera")) {
-                if(!modVersion("realcamera").equals("0.7.8-beta-44cc101"))unsupported=true;
+                if(!modVersion("realcamera").equals("0.7.8-beta"))unsupported=true;
                 else io.github.derkottersberg.seamlessrowing.integration.RealCameraAdapter.register();
             }
             if(isModLoaded("firstperson")) {
@@ -23,8 +23,12 @@ public abstract class IntegrationServices implements ClientPlatformServices {
                 else {io.github.derkottersberg.seamlessrowing.integration.NeaAdapter.register();nea=true;}
             }
             if(isModLoaded("player_animation_library")) {
-                if(!modVersion("player_animation_library").equals("1.2.8+mc.26.3")) unsupported=true;
+                if(!modVersion("player_animation_library").equals("1.1.6+mc.1.21.1")) unsupported=true;
                 else pal=true;
+            }
+            if(isModLoaded("playeranimator")){
+                if(!modVersion("playeranimator").equals("2.0.4+1.21.1"))unsupported=true;
+                else playerAnimator=true;
             }
             if(isModLoaded("entity_model_features") && modVersion("entity_model_features").startsWith("3.3.11"))
                 io.github.derkottersberg.seamlessrowing.integration.EmfAdapter.register();
@@ -43,21 +47,21 @@ public abstract class IntegrationServices implements ClientPlatformServices {
         if(isModLoaded("entity_model_features") && modVersion("entity_model_features").startsWith("3.3.11"))
             io.github.derkottersberg.seamlessrowing.integration.EmfAdapter.reload(resources);
     }
-    public boolean playerGeometrySupported(net.minecraft.client.model.player.PlayerModel model) {
+    public boolean playerGeometrySupported(net.minecraft.client.model.PlayerModel model) {
         if(!isModLoaded("entity_model_features"))return ClientPlatformServices.super.playerGeometrySupported(model);
         try{return io.github.derkottersberg.seamlessrowing.integration.EmfAdapter.geometry(model);}
         catch(RuntimeException|LinkageError invalid){return false;}
     }
-    public void prepareRowingModel(net.minecraft.client.model.player.PlayerModel model) {
+    public void prepareRowingModel(net.minecraft.client.model.PlayerModel model) {
         if(isModLoaded("entity_model_features"))io.github.derkottersberg.seamlessrowing.integration.EmfAdapter.prepare(model);
     }
     public boolean externalAnimationActive(net.minecraft.client.player.AbstractClientPlayer player) {
-        if(!pal) return false;
-        try{return io.github.derkottersberg.seamlessrowing.integration.PalAdapter.active(player);}
+        if(!pal&&!playerAnimator) return false;
+        try{return pal&&PalAdapter.active(player)||playerAnimator&&PlayerAnimatorAdapter.active(player);}
         catch(RuntimeException|LinkageError invalid){unsupported=true;status="PAL rig unavailable: rowing safely disabled.";
             org.slf4j.LoggerFactory.getLogger("Seamless Rowing").warn(status,invalid);return true;}
     }
-    public boolean customPlayerModel(net.minecraft.client.model.player.PlayerModel model) {
+    public boolean customPlayerModel(net.minecraft.client.model.PlayerModel model) {
         if(!isModLoaded("entity_model_features")) return false;
         if(!modVersion("entity_model_features").startsWith("3.3.11")) {status="Unsupported EMF model API: existing visuals preserved.";return true;}
         try{

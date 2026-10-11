@@ -1,12 +1,13 @@
-dependencies { compileOnly project(':neoforge'); compileOnly libs.mixin }
-sourceSets.main {
-    java.srcDir rootProject.file('qa/src/main/java')
-    java.exclude '**/QaFabricClient.java'
-    resources.srcDir rootProject.file('qa/src/main/resources')
-    resources.exclude 'fabric.mod.json'
-    compileClasspath += project(':neoforge').sourceSets.main.compileClasspath
+plugins { id 'dev.architectury.loom' }
+dependencies {
+    minecraft libs.minecraft
+    mappings loom.officialMojangMappings()
+    neoForge libs.neoforge
+    compileOnly project(':neoforge')
+    compileOnly project(':common')
 }
-tasks.named('jar') {
-    archiveFileName='seamless-rowing-qa-neoforge.jar'
-    manifest { attributes 'MixinConfigs':'rowing-qa.mixins.json' }
-}
+sourceSets.main.compileClasspath += project(':neoforge').sourceSets.main.compileClasspath
+sourceSets.main { java { srcDir rootProject.file('qa/src/main/java'); exclude '**/QaFabricClient.java' }; resources { srcDir rootProject.file('qa/src/main/resources'); exclude 'fabric.mod.json' } }
+loom { accessWidenerPath=rootProject.file('common/src/main/resources/seamlessrowing.accesswidener'); mixin { useLegacyMixinAp=true; defaultRefmapName='rowing-qa.refmap.json' }; mods { rowingqa { sourceSet sourceSets.main } } }
+tasks.named('jar') { archiveFileName='seamless-rowing-qa-neoforge-dev.jar'; manifest { attributes 'MixinConfigs':'rowing-qa.mixins.json' } }
+tasks.named('remapJar') { archiveFileName='seamless-rowing-qa-neoforge.jar' }

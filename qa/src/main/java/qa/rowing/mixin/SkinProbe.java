@@ -2,7 +2,7 @@ package qa.rowing.mixin;
 
 import qa.rowing.MatrixScenario;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.world.entity.player.PlayerSkin;
+import net.minecraft.client.resources.PlayerSkin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;

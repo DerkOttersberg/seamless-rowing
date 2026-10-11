@@ -1,13 +1,13 @@
 package io.github.derkottersberg.seamlessrowing.integration;
 
-import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.model.PlayerModel;
 import traben.entity_model_features.models.IEMFModel;
 import traben.entity_model_features.EMFAnimationApi;
 import io.github.derkottersberg.seamlessrowing.client.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import java.security.MessageDigest;
 import java.util.HexFormat;
@@ -19,7 +19,7 @@ public final class EmfAdapter {
         fresh=FreshPlayerRig.known(digest(resources,"player.jem"),digest(resources,"player_slim.jem"));
     }
     private static String digest(ResourceManager resources,String file) {
-        var resource=resources.getResource(Identifier.fromNamespaceAndPath("minecraft","emf/cem/"+file));
+        var resource=resources.getResource(ResourceLocation.fromNamespaceAndPath("minecraft","emf/cem/"+file));
         if(resource.isEmpty())return "";
         try(var input=resource.get().open()) {
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(input.readAllBytes()));

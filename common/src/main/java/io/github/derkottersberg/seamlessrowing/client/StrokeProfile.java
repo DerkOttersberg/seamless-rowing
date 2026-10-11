@@ -13,7 +13,7 @@ public final class StrokeProfile {
         return .5f*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t*t+(-a+3*b-3*c+d)*t*t*t);
     }
     public static float[] prepare(net.minecraft.server.packs.resources.ResourceManager resources) {
-        var id=net.minecraft.resources.Identifier.fromNamespaceAndPath("seamlessrowing","animations/fixed_seat.json");
+        var id=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("seamlessrowing","animations/fixed_seat.json");
         try(var reader=resources.getResourceOrThrow(id).openAsReader()) {
             return validate(com.google.gson.JsonParser.parseReader(reader).getAsJsonObject());
         } catch(Exception invalid) {

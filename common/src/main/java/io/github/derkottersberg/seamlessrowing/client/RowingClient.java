@@ -5,11 +5,11 @@ import io.github.derkottersberg.seamlessrowing.internal.ClientPlatformServices;
 import io.github.derkottersberg.seamlessrowing.math.PaddlePose;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.entity.state.*;
-import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.phys.Vec3;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -41,34 +41,32 @@ public final class RowingClient {
         var mc=Minecraft.getInstance();
         return mc!=null&&mc.player!=null&&settings.enabled()&&settings.firstPerson()&&!customRig()&&!skinLayers()
                 &&mc.options.getCameraType().isFirstPerson()&&mc.getCameraEntity()==mc.player
-                &&mc.player.getVehicle() instanceof AbstractBoat boat&&eligible(mc.player,boat);
+                &&mc.player.getVehicle() instanceof Boat boat&&eligible(mc.player,boat);
     }
     public static boolean restoresPaddles() {return platform.paddleVisibilityHandoff();}
-    public static void prepareModel(net.minecraft.client.model.player.PlayerModel model) {platform.prepareRowingModel(model);}
+    public static void prepareModel(net.minecraft.client.model.PlayerModel model) {platform.prepareRowingModel(model);}
     public static void save(ClientSettings draft) throws IOException { draft.save(configPath()); settings=draft; clear(); }
-    public static void clear() { TRACKS.clear(); levelIdentity=null; }
+    public static void clear() { TRACKS.clear(); levelIdentity=null;RenderContext.clear(); }
     public static String compatibilityStatus() {
         if(platform.unsupportedAnimationIntegration()) return platform.integrationStatus();
         if (platform.isModLoaded("figura") || platform.isModLoaded("cpm") || platform.isModLoaded("epicfight"))
             return "Custom player rig detected: rowing visuals safely disabled.";
         if (skinLayers()) return "3D Skin Layers: rigid third-person arms; existing first-person rendering preserved.";
-        if (platform.isModLoaded("playeranimator") || platform.isModLoaded("player-animation-lib"))
-            return "Animation library detected: conservative fallback until its adapter is verified.";
         return "Vanilla rigs supported. "+platform.integrationStatus();
     }
     public static boolean customRig() {
         return platform.unsupportedAnimationIntegration() || platform.isModLoaded("figura") || platform.isModLoaded("cpm") || platform.isModLoaded("epicfight")
-                || platform.isModLoaded("playeranimator") || platform.isModLoaded("player-animation-lib");
+                || platform.isModLoaded("player-animation-lib");
     }
     private static boolean skinLayers() { return platform.isModLoaded("skinlayers3d") || platform.isModLoaded("skinlayers"); }
     public static void tick() {
         Minecraft mc=Minecraft.getInstance();
-        if (platform.consumeSettingsClick() && mc.gui.screen()==null) mc.setScreenAndShow(new RowingSettingsScreen(null));
+        if (platform.consumeSettingsClick() && mc.screen==null) mc.setScreen(new RowingSettingsScreen(null));
         if (mc.level!=levelIdentity) { clear(); levelIdentity=mc.level; }
         if (mc.level==null || !settings.enabled() || customRig()) { TRACKS.clear(); return; }
         Set<UUID> seen=new HashSet<>();
         for (var entity:mc.level.entitiesForRendering()) {
-            if (!(entity instanceof AbstractBoat boat) || !(boat.getControllingPassenger() instanceof AbstractClientPlayer driver)
+            if (!(entity instanceof Boat boat) || !(boat.getControllingPassenger() instanceof AbstractClientPlayer driver)
                     || !eligible(driver,boat)) continue;
             seen.add(boat.getUUID());
             Track track=TRACKS.get(boat.getUUID());
@@ -80,10 +78,10 @@ public final class RowingClient {
         }
         TRACKS.keySet().retainAll(seen);
     }
-    public static boolean eligible(AbstractClientPlayer player,AbstractBoat boat) {
+    public static boolean eligible(AbstractClientPlayer player,Boat boat) {
         var avatarRenderer=Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(player);
-        if(!(avatarRenderer instanceof AvatarRenderer<?> avatar)
-                || avatar.getModel().getClass()!=net.minecraft.client.model.player.PlayerModel.class
+        if(!(avatarRenderer instanceof PlayerRenderer avatar)
+                || avatar.getModel().getClass()!=net.minecraft.client.model.PlayerModel.class
                 || platform.customPlayerModel(avatar.getModel())
                 || !platform.playerGeometrySupported(avatar.getModel())) return false;
         // A replacement renderer needs a verified geometry adapter, even if its entity subclasses a boat.
@@ -96,8 +94,8 @@ public final class RowingClient {
     public static boolean owns(AbstractClientPlayer player,boolean left) {
         if (player.isUsingItem()) return false;
         HumanoidArm side=left ? HumanoidArm.LEFT : HumanoidArm.RIGHT;
-        if (player.isSwinging()) {
-            HumanoidArm swing=player.getCurrentSwing().hand()==InteractionHand.OFF_HAND ? player.getMainArm().getOpposite() : player.getMainArm();
+        if (player.swinging) {
+            HumanoidArm swing=player.swingingArm==InteractionHand.OFF_HAND ? player.getMainArm().getOpposite() : player.getMainArm();
             if (side==swing) return false;
         }
         return true;
@@ -106,7 +104,7 @@ public final class RowingClient {
     public static boolean requestsRowingRig(AbstractClientPlayer player) {
         var mc=Minecraft.getInstance();
         if(!settings.enabled() || customRig() || !player.isAlive() || player.isSleeping() || player.isSpectator()
-                || !(player.getVehicle() instanceof AbstractBoat boat) || boat.getControllingPassenger()!=player
+                || !(player.getVehicle() instanceof Boat boat) || boat.getControllingPassenger()!=player
                 || geometry(boat)==null || platform.externalAnimationActive(player) || player.isUsingItem()) return false;
         boolean first=player==mc.player && mc.options.getCameraType().isFirstPerson();
         if(first ? !settings.firstPerson() || skinLayers() : !settings.thirdPerson()) return false;
@@ -117,7 +115,7 @@ public final class RowingClient {
     }
     public static RowingPose capture(AbstractClientPlayer player,float partial,boolean firstPerson) {
         if(firstPerson && Minecraft.getInstance().getCameraEntity()!=player) return null;
-        if (!settings.enabled() || customRig() || !(player.getVehicle() instanceof AbstractBoat boat)
+        if (!settings.enabled() || customRig() || !(player.getVehicle() instanceof Boat boat)
                 || !eligible(player,boat) || (firstPerson ? !settings.firstPerson() : !settings.thirdPerson())) return null;
         if(firstPerson&&skinLayers()) return null;
         Track track=TRACKS.get(boat.getUUID());
@@ -134,45 +132,37 @@ public final class RowingClient {
         Matrix4f boatMatrix=boatMatrix(boat,partial);
         Vec3 left=relative.add(geometry.grip(boatMatrix,l,false));
         Vec3 right=relative.add(geometry.grip(boatMatrix,r,true));
-        float lean=settings.torso() && !player.isUsingItem() && !player.isSwinging()
+        float lean=settings.torso() && !player.isUsingItem() && !player.swinging
                 ? (track.left.lean(boat.getRowingTime(0,partial),partial)+track.right.lean(boat.getRowingTime(1,partial),partial))*.5f : 0;
-        float twist=settings.torso() && !player.isUsingItem() && !player.isSwinging() ? (l.yaw()*lw-r.yaw()*rw)*.12f : 0;
-        return new RowingPose(left,right,lw,rw,ol,or,settings.elbows()&&!skinLayers(),lean,twist,l,r,
+        float twist=settings.torso() && !player.isUsingItem() && !player.swinging ? (l.yaw()*lw-r.yaw()*rw)*.12f : 0;
+        return new RowingPose(left,right,lw,rw,ol,or,settings.elbows()&&!skinLayers()&&nativeEquipment(player),lean,twist,l,r,
                 geometry.shaft(boatMatrix,l,false),geometry.shaft(boatMatrix,r,true));
     }
-    private static PaddleGeometry geometry(AbstractBoat boat) {
+    private static boolean nativeEquipment(AbstractClientPlayer player) {
+        for(var item:player.getArmorSlots())if(!item.isEmpty()&&item.getItem().getClass()!=net.minecraft.world.item.ArmorItem.class)return false;
+        return true;
+    }
+    private static PaddleGeometry geometry(Boat boat) {
         var renderer=Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(boat);
         for(var adapter:GEOMETRY) if(adapter.matches(boat,renderer)) return adapter;
         return null;
     }
-    public static Matrix4f boatMatrix(AbstractBoat boat,float partial) {
+    public static Matrix4f boatMatrix(Boat boat,float partial) {
         PoseStack stack=new PoseStack(); stack.translate(0,.375f,0);
-        stack.rotateDegrees(Axis.YP,180-boat.getYRot(partial));
+        stack.mulPose(Axis.YP.rotationDegrees(180-net.minecraft.util.Mth.rotLerp(partial,boat.yRotO,boat.getYRot())));
         float hurt=boat.getHurtTime()-partial,damage=Math.max(0,boat.getDamage()-partial);
-        if (hurt>0) stack.rotateDegrees(Axis.XP,(float)Math.sin(hurt)*hurt*damage/10*boat.getHurtDir());
+        if (hurt>0) stack.mulPose(Axis.XP.rotationDegrees((float)Math.sin(hurt)*hurt*damage/10*boat.getHurtDir()));
         if (!boat.isUnderWater() && Math.abs(boat.getBubbleAngle(partial))>1e-5)
-            stack.rotate(new Quaternionf().setAngleAxis(boat.getBubbleAngle(partial)*(float)Math.PI/180,1,0,1));
-        stack.scale(-1,-1,1); stack.rotateDegrees(Axis.YP,90);
+            stack.mulPose(new Quaternionf().setAngleAxis(boat.getBubbleAngle(partial)*(float)Math.PI/180,1,0,1));
+        stack.scale(-1,-1,1); stack.mulPose(Axis.YP.rotationDegrees(90));
         return new Matrix4f(stack.last().pose());
     }
-    @SuppressWarnings({"rawtypes","unchecked"})
-    public static AvatarRenderState firstPersonState(AbstractBoat boat,float partial) {
-        Minecraft mc=Minecraft.getInstance();
-        if (!mc.options.getCameraType().isFirstPerson() || mc.player==null || mc.getCameraEntity()!=mc.player || mc.player.getVehicle()!=boat)
-            return null;
-        var row=capture(mc.player,partial,true);
-        if (row==null || (!row.ownLeft()&&!row.ownRight())) return null;
-        AvatarRenderer renderer=(AvatarRenderer)mc.getEntityRenderDispatcher().getRenderer(mc.player);
-        AvatarRenderState state=renderer.createRenderState(); renderer.extractRenderState(mc.player,state,partial);
-        ((RowingState)state).rowingPose(capture(mc.player,partial,true));
-        ((RowingState)state).rowingHandsOnly(true);
-        state.nameTag=null; state.scoreText=null; state.displayFireAnimation=false;
-        state.showCape=false; state.parrotOnLeftShoulder=null; state.parrotOnRightShoulder=null;
-        state.arrowCount=0; state.stingerCount=0;
-        state.headEquipment=net.minecraft.world.item.ItemStack.EMPTY;
-        state.heldOnHead.clear();
-        state.legsEquipment=net.minecraft.world.item.ItemStack.EMPTY;
-        state.feetEquipment=net.minecraft.world.item.ItemStack.EMPTY;
-        return state;
+    public static void renderFirstPerson(Boat boat,float partial,PoseStack stack,net.minecraft.client.renderer.MultiBufferSource buffers,int light) {
+        var mc=Minecraft.getInstance();if(!mc.options.getCameraType().isFirstPerson()||mc.player==null||mc.getCameraEntity()!=mc.player||mc.player.getVehicle()!=boat)return;
+        var row=capture(mc.player,partial,true);if(row==null)return;
+        var renderer=mc.getEntityRenderDispatcher().getRenderer(mc.player);if(!(renderer instanceof PlayerRenderer playerRenderer))return;
+        var relative=mc.player.getPosition(partial).subtract(boat.getPosition(partial));
+        stack.pushPose();stack.translate(relative.x,relative.y,relative.z);
+        try{RenderContext.hands(()->playerRenderer.render(mc.player,mc.player.getViewYRot(partial),partial,stack,buffers,light));}finally{stack.popPose();}
     }
 }

@@ -56,7 +56,7 @@ public final class RemoteScenario {
             var pose=RowingClient.capture(mc.player,1,mc.options.getCameraType().isFirstPerson());
             if(pose!=null&&(pose.ownLeft()||pose.ownRight())) owned++;
             if(mc.player.isUsingItem()&&(pose==null||(!pose.ownLeft()&&!pose.ownRight()))) useReleased++;
-            if(mc.player.isSwinging()&&!RowingClient.owns(mc.player,mc.player.getMainArm()==net.minecraft.world.entity.HumanoidArm.LEFT)) swingsReleased++;
+            if(mc.player.swinging&&!RowingClient.owns(mc.player,mc.player.getMainArm()==net.minecraft.world.entity.HumanoidArm.LEFT)) swingsReleased++;
             if(local>=102&&local<110&&pose==null) postStop++;
             if(local>=122&&local<128&&pose==null) backwards++;
         } else {
@@ -67,7 +67,7 @@ public final class RemoteScenario {
                 if(pose!=null&&(pose.ownLeft()||pose.ownRight())) owned++;
             }
         }
-        if(tick<(role.equals("observer")?900:420)) Screenshot.grab(mc.gameDirectory,String.format("mp-%04d.png",tick),mc.gameRenderer.mainRenderTarget(),1,message->{});
+        if(tick<(role.equals("observer")?900:420)) Screenshot.grab(mc.gameDirectory,String.format("mp-%04d.png",tick),mc.getMainRenderTarget(),message->{});
         if(role.equals("rower")&&tick==425) {
             try {Files.writeString(mc.gameDirectory.toPath().getParent().resolve("mp-rower-done"),"done");}
             catch(Exception failure){throw new RuntimeException(failure);}

@@ -23,10 +23,10 @@ public final class RowingQaClient {
     }
     public void tick(Minecraft mc) {
         mc.options.pauseOnLostFocus=false;
-        if(++startup%100==0&&tick==0)System.out.println("ROWING_QA_STARTUP screen="+(mc.gui.screen()==null?"none":mc.gui.screen().getClass().getName())+" player="+(mc.player!=null)+" vehicle="+(mc.player==null?null:mc.player.getVehicle()));
-        if(mc.player!=null&&!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
-        if(System.getProperty("qa.rowing.scenario","").equals("settings")) { SettingsScenario.tick(mc);return; }
-        if(mc.player==null || mc.level==null || mc.gui.screen()!=null) return;
+        if(++startup%100==0&&tick==0)System.out.println("ROWING_QA_STARTUP screen="+(mc.screen==null?"none":mc.screen.getClass().getName())+" player="+(mc.player!=null)+" vehicle="+(mc.player==null?null:mc.player.getVehicle()));
+        if(mc.player!=null&&!mc.options.hideGui) mc.options.hideGui=true;
+        if(System.getProperty("qa.rowing.scenario","").equals("settings")) {SettingsScenario.tick(mc);return;}
+        if(mc.player==null || mc.level==null || mc.screen!=null) return;
         if(!System.getProperty("qa.rowing.role","").isEmpty()) { RemoteScenario.tick(mc);return; }
         var server=mc.getSingleplayerServer(); if(server==null) return;
         if(fixture.compareAndSet(false,true)) server.execute(()->{
@@ -39,12 +39,14 @@ public final class RowingQaClient {
                 level.setBlock(new BlockPos(x,-58,z),Blocks.AIR.defaultBlockState(),2);
             }
             var player=server.getPlayerList().getPlayerByName("RowQA");
-            player.setGameMode(GameType.CREATIVE);player.getInventory().clearContent();player.teleportTo(level,0,-57,0,Set.of(),0,55,true);
-            var boat=EntityTypes.OAK_BOAT.create(level,EntitySpawnReason.COMMAND);
-            boat.setPos(0,-58.1,0);level.addFreshEntity(boat);player.startRiding(boat,true,true);
+            player.setGameMode(GameType.CREATIVE);player.getInventory().clearContent();player.teleportTo(level,0,-57,0,Set.of(),0,55);
+            var boat=new net.minecraft.world.entity.vehicle.Boat(level,0,-58.1,0);
+            boat.setPos(0,-58.1,0);level.addFreshEntity(boat);player.startRiding(boat,true);
             server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),"time set 6000");
         });
         if(System.getProperty("qa.rowing.scenario","").equals("fresh")) {FreshScenario.tick(mc);return;}
+        if(mc.player.getVehicle()!=null&&System.getProperty("qa.rowing.scenario","").equals("lifecycle")){LifecycleScenario.tick(mc);return;}
+        if(mc.player.getVehicle()!=null&&System.getProperty("qa.rowing.scenario","").equals("fallback")){FallbackScenario.tick(mc);return;}
         if(mc.player.getVehicle()==null) {
             if(++missingVehicle==60) {
                 System.out.println("ROWING_QA_FAILED missing vehicle position="+mc.player.position());mc.stop();
@@ -53,8 +55,6 @@ public final class RowingQaClient {
         }
         missingVehicle=0;
         if(System.getProperty("qa.rowing.scenario","").equals("matrix")) { MatrixScenario.tick(mc);return; }
-        if(System.getProperty("qa.rowing.scenario","").equals("lifecycle")) { LifecycleScenario.tick(mc);return; }
-        if(System.getProperty("qa.rowing.scenario","").equals("fallback")) { FallbackScenario.tick(mc);return; }
         tick++;
         if(tick%20==0) System.out.println("ROWING_QA_TICK "+tick+" position="+mc.player.position()+" boat="+mc.player.getVehicle().getType()+" samples="+samples+" error="+maxError);
         mc.player.setYRot(0);mc.player.setXRot(tick<100 ? 45 : tick<200 ? 20 : -15);
@@ -64,7 +64,7 @@ public final class RowingQaClient {
         mc.options.keyLeft.setDown(local>=44 && local<56);
         if(tick%1==0 && local>=1 && local<96) {
             String name=String.format("rowing-%03d.png",tick);
-            Screenshot.grab(mc.gameDirectory,name,mc.gameRenderer.mainRenderTarget(),1,message->{});
+            Screenshot.grab(mc.gameDirectory,name,mc.getMainRenderTarget(),message->{});
         }
         if(tick>=292) {
             mc.options.keyUp.setDown(false);mc.options.keyLeft.setDown(false);

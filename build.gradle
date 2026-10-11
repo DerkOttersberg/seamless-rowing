@@ -55,10 +55,10 @@ tasks.register('verifyCommonIsolation') {
     }
 }
 tasks.register('verifyPreviewJar') {
-    dependsOn ':fabric:jar', ':forge:jar', ':neoforge:jar'
+    dependsOn ':fabric:remapJar', ':forge:remapJar', ':neoforge:remapJar'
     doLast {
         ['fabric','forge','neoforge'].each { loader ->
-        def jar = project(":"+loader).tasks.named('jar').get().archiveFile.get().asFile
+        def jar = project(":"+loader).tasks.named('remapJar').get().archiveFile.get().asFile
         new java.util.zip.ZipFile(jar).withCloseable { zip ->
             def metadataPath=loader=='fabric'?'fabric.mod.json':loader=='forge'?'META-INF/mods.toml':'META-INF/neoforge.mods.toml'
             [metadataPath, 'seamlessrowing.mixins.json', 'seamlessrowing.compat.mixins.json', 'assets/seamlessrowing/icon.png',

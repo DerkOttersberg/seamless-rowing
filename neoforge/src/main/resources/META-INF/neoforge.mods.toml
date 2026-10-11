@@ -12,17 +12,17 @@ authors="Derk Ottersberg"
 description='''Client-only articulated rowing arms and body motion, aligned with vanilla boat paddles. Servers need no installation.'''
 displayTest="IGNORE_ALL_VERSION"
 [features.seamlessrowing]
-javaVersion="[25,)"
+javaVersion="[21,)"
 [[dependencies.seamlessrowing]]
 modId="neoforge"
 type="required"
-versionRange="[26.3.0.48-beta,26.4)"
+versionRange="[21.1.255,22)"
 ordering="NONE"
 side="CLIENT"
 [[dependencies.seamlessrowing]]
 modId="minecraft"
 type="required"
-versionRange="[26.3]"
+versionRange="[1.21.1]"
 ordering="NONE"
 side="CLIENT"
 
@@ -30,3 +30,6 @@ side="CLIENT"
 config="seamlessrowing.mixins.json"
 [[mixins]]
 config="seamlessrowing.compat.mixins.json"
+
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"

@@ -1,9 +1,9 @@
 package io.github.derkottersberg.seamlessrowing.internal;
 
 public interface ClientPlatformServices extends PlatformServices {
-    default boolean customPlayerModel(net.minecraft.client.model.player.PlayerModel model){return false;}
-    default void prepareRowingModel(net.minecraft.client.model.player.PlayerModel model) {}
-    default boolean playerGeometrySupported(net.minecraft.client.model.player.PlayerModel model) {
+    default boolean customPlayerModel(net.minecraft.client.model.PlayerModel model){return false;}
+    default void prepareRowingModel(net.minecraft.client.model.PlayerModel model) {}
+    default boolean playerGeometrySupported(net.minecraft.client.model.PlayerModel model) {
         return io.github.derkottersberg.seamlessrowing.client.TorsoSurface.supported(model.body)
                 && io.github.derkottersberg.seamlessrowing.client.ArmMesh.supported(model.leftArm)
                 && io.github.derkottersberg.seamlessrowing.client.ArmMesh.supported(model.rightArm);
