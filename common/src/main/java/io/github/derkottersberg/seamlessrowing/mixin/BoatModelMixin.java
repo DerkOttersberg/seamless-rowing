@@ -14,10 +14,10 @@ public class BoatModelMixin {
     @Shadow @Final private ModelPart rightPaddle;
     @Inject(method="setupAnim(Lnet/minecraft/client/renderer/entity/state/BoatRenderState;)V",at=@At("TAIL"))
     private void rowing$ease(BoatRenderState state,CallbackInfo ci) {
-        var pose=((BoatState)state).rowingBoatPose(); if(pose==null) return;
-        if(((BoatState)state).rowingLocalPlayer()!=null&&RowingClient.restoresPaddles()) {
+        if(((BoatState)state).rowingRestorePaddles()) {
             leftPaddle.visible=true;rightPaddle.visible=true;
         }
+        var pose=((BoatState)state).rowingBoatPose(); if(pose==null) return;
         leftPaddle.xRot=pose.leftPaddle().pitch(); leftPaddle.yRot=pose.leftPaddle().yaw();
         rightPaddle.xRot=pose.rightPaddle().pitch(); rightPaddle.yRot=(float)Math.PI-pose.rightPaddle().yaw();
     }

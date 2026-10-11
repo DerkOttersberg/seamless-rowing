@@ -18,7 +18,7 @@ public final class RowingArmLayer extends RenderLayer<AvatarRenderState,PlayerMo
     public RowingArmLayer(RenderLayerParent<AvatarRenderState,PlayerModel> parent) { super(parent); }
     @Override public void submit(PoseStack stack,SubmitNodeCollector collector,int light,AvatarRenderState state,float yaw,float pitch) {
         RowingState carrier=(RowingState)state; RowingPose pose=carrier.rowingPose();
-        if(pose==null || !pose.articulated() || carrier.rowingBase()==null || state.isInvisible) return;
+        if(pose==null || !pose.articulated()&&!carrier.rowingHandsOnly() || carrier.rowingBase()==null || state.isInvisible) return;
         PlayerModel model=getParentModel();
         if(!ArmMesh.supported(model.leftArm) || !ArmMesh.supported(model.rightArm)) return;
         if(rig==null) rig=new ArmRigModel(model);
@@ -26,12 +26,13 @@ public final class RowingArmLayer extends RenderLayer<AvatarRenderState,PlayerMo
         ArmRigModel.Bone left=solve(model.leftArm,pose,true,transform,state.showLeftSleeve);
         ArmRigModel.Bone right=solve(model.rightArm,pose,false,transform,state.showRightSleeve);
         collector.submitModel(rig,new ArmRigModel.DrawState(left,right,carrier.rowingHandsOnly()),stack,state.skin.body().texturePath(),light,
-                LivingEntityRenderer.getOverlayCoords(state,0),state.outlineColor);
+                LivingEntityRenderer.getOverlayCoords(state,0),state.outlineColor,null);
     }
     public static ArmRigModel.Bone solve(ModelPart part,RowingPose pose,boolean left,Matrix4f transform,boolean sleeve) {
         var cube=((ModelPartAccess)(Object)part).rowingCubes().getFirst(); float center=(cube.minX+cube.maxX)/2;
         Quaternionf original=new Quaternionf().rotationZYX(part.zRot,part.yRot,part.xRot);
         Vector3f start=original.transform(new Vector3f(center,-2,0)).add(part.x,part.y,part.z);
+        if(!pose.articulated())return new ArmRigModel.Bone(start,original,new Quaternionf(),pose.owns(left),sleeve);
         Vector3f shoulder=new Vector3f(part.x+center,part.y-2,part.z);
         float weight=pose.weight(left); start.lerp(shoulder,weight); shoulder=start;
         var grip=pose.grip(left);

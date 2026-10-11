@@ -16,13 +16,13 @@ javaVersion="[25,)"
 [[dependencies.seamlessrowing]]
 modId="neoforge"
 type="required"
-versionRange="[26.3.0.48-beta,26.4)"
+versionRange="[26.2.0.75,26.3)"
 ordering="NONE"
 side="CLIENT"
 [[dependencies.seamlessrowing]]
 modId="minecraft"
 type="required"
-versionRange="[26.3]"
+versionRange="[26.2]"
 ordering="NONE"
 side="CLIENT"
 

@@ -5,3 +5,5 @@ dependencies {
 }
 sourceSets.main.compileClasspath += project(':fabric').sourceSets.main.compileClasspath
 tasks.named('jar') { archiveFileName = 'seamless-rowing-qa.jar' }
+
+dependencies { compileOnly project(':optional-api-stubs') }

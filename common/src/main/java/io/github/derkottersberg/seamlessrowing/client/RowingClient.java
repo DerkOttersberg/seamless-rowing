@@ -48,6 +48,7 @@ public final class RowingClient {
     public static void save(ClientSettings draft) throws IOException { draft.save(configPath()); settings=draft; clear(); }
     public static void clear() { TRACKS.clear(); levelIdentity=null; }
     public static String compatibilityStatus() {
+        if(platform.customBoatGeometry())return "Custom boat resource geometry: existing boat and player rendering preserved.";
         if(platform.unsupportedAnimationIntegration()) return platform.integrationStatus();
         if (platform.isModLoaded("figura") || platform.isModLoaded("cpm") || platform.isModLoaded("epicfight"))
             return "Custom player rig detected: rowing visuals safely disabled.";
@@ -96,8 +97,8 @@ public final class RowingClient {
     public static boolean owns(AbstractClientPlayer player,boolean left) {
         if (player.isUsingItem()) return false;
         HumanoidArm side=left ? HumanoidArm.LEFT : HumanoidArm.RIGHT;
-        if (player.isSwinging()) {
-            HumanoidArm swing=player.getCurrentSwing().hand()==InteractionHand.OFF_HAND ? player.getMainArm().getOpposite() : player.getMainArm();
+        if (player.swinging) {
+            HumanoidArm swing=player.swingingArm==InteractionHand.OFF_HAND ? player.getMainArm().getOpposite() : player.getMainArm();
             if (side==swing) return false;
         }
         return true;
@@ -134,25 +135,26 @@ public final class RowingClient {
         Matrix4f boatMatrix=boatMatrix(boat,partial);
         Vec3 left=relative.add(geometry.grip(boatMatrix,l,false));
         Vec3 right=relative.add(geometry.grip(boatMatrix,r,true));
-        float lean=settings.torso() && !player.isUsingItem() && !player.isSwinging()
+        float lean=settings.torso() && !player.isUsingItem() && !player.swinging
                 ? (track.left.lean(boat.getRowingTime(0,partial),partial)+track.right.lean(boat.getRowingTime(1,partial),partial))*.5f : 0;
-        float twist=settings.torso() && !player.isUsingItem() && !player.isSwinging() ? (l.yaw()*lw-r.yaw()*rw)*.12f : 0;
+        float twist=settings.torso() && !player.isUsingItem() && !player.swinging ? (l.yaw()*lw-r.yaw()*rw)*.12f : 0;
         return new RowingPose(left,right,lw,rw,ol,or,settings.elbows()&&!skinLayers(),lean,twist,l,r,
                 geometry.shaft(boatMatrix,l,false),geometry.shaft(boatMatrix,r,true));
     }
     private static PaddleGeometry geometry(AbstractBoat boat) {
+        if(platform.customBoatGeometry())return null;
         var renderer=Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(boat);
         for(var adapter:GEOMETRY) if(adapter.matches(boat,renderer)) return adapter;
         return null;
     }
     public static Matrix4f boatMatrix(AbstractBoat boat,float partial) {
         PoseStack stack=new PoseStack(); stack.translate(0,.375f,0);
-        stack.rotateDegrees(Axis.YP,180-boat.getYRot(partial));
+        stack.mulPose(Axis.YP.rotationDegrees(180-boat.getYRot(partial)));
         float hurt=boat.getHurtTime()-partial,damage=Math.max(0,boat.getDamage()-partial);
-        if (hurt>0) stack.rotateDegrees(Axis.XP,(float)Math.sin(hurt)*hurt*damage/10*boat.getHurtDir());
+        if (hurt>0) stack.mulPose(Axis.XP.rotationDegrees((float)Math.sin(hurt)*hurt*damage/10*boat.getHurtDir()));
         if (!boat.isUnderWater() && Math.abs(boat.getBubbleAngle(partial))>1e-5)
-            stack.rotate(new Quaternionf().setAngleAxis(boat.getBubbleAngle(partial)*(float)Math.PI/180,1,0,1));
-        stack.scale(-1,-1,1); stack.rotateDegrees(Axis.YP,90);
+            stack.mulPose(new Quaternionf().setAngleAxis(boat.getBubbleAngle(partial)*(float)Math.PI/180,1,0,1));
+        stack.scale(-1,-1,1); stack.mulPose(Axis.YP.rotationDegrees(90));
         return new Matrix4f(stack.last().pose());
     }
     @SuppressWarnings({"rawtypes","unchecked"})

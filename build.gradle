@@ -17,13 +17,13 @@ allprojects {
         maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
         ivy {
             url = 'https://github.com/tr7zw'
-            patternLayout { artifact '[module]/releases/download/[revision]/[artifact]-[revision]-mc26.3.[ext]' }
+            patternLayout { artifact '[module]/releases/download/[revision]/[artifact]-[revision]-mc26.2.[ext]' }
             metadataSources { artifact() }
             content { includeGroup 'tr7zw' }
         }
         ivy {
             url = 'https://github.com/PlayerAnimationLibrary'
-            patternLayout { artifact '[module]/releases/download/v[revision]+26.3/[artifact]-[revision]+mc.26.3.[ext]' }
+            patternLayout { artifact '[module]/releases/download/v[revision]+26.2/[artifact]-[revision]+mc.26.2.[ext]' }
             metadataSources { artifact() }
             content { includeGroup 'com.zigythebird' }
         }
@@ -74,11 +74,14 @@ tasks.register('verifyPreviewJar') {
                 throw new GradleException('Incorrect client-only/standalone metadata')
             } else {
                 def metadata=zip.getInputStream(zip.getEntry(metadataPath)).getText('UTF-8')
+                def nativePin=loader=='forge'?libs.versions.forge.get().tokenize('-').last():libs.versions.neoforge.get()
+                if(!metadata.contains('versionRange="['+nativePin+',')||!metadata.contains('javaVersion="['+libs.versions.java.get()+',)"'))
+                    throw new GradleException('Incorrect native loader/Java metadata')
                 if(!metadata.contains('versionRange="['+libs.versions.minecraft.get()+']"')||metadata.contains('seamlessapi'))
                     throw new GradleException('Incorrect Minecraft/standalone metadata')
             }
-            if (zip.entries().any { it.name.startsWith('qa/') || it.name.contains('/qa/') || it.name.startsWith('com/derko/seamlessapi/') })
-                throw new GradleException('Test code or SeamlessLib packaged')
+            if (zip.entries().any { it.name.startsWith('qa/') || it.name.contains('/qa/') || it.name.startsWith('com/derko/seamlessapi/') || it.name.startsWith('io/github/derkottersberg/swordthrow/') })
+                throw new GradleException('Test or optional API code packaged')
             zip.entries().findAll { it.name.endsWith('.class') }.each {
                 def header=new java.io.DataInputStream(zip.getInputStream(it))
                 header.readInt();header.readUnsignedShort()

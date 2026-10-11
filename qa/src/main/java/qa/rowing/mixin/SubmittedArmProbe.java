@@ -19,8 +19,8 @@ public class SubmittedArmProbe {
     private void capture(PoseStack stack,SubmitNodeCollector collector,int light,AvatarRenderState state,float yaw,float pitch,CallbackInfo ci) {
         probe$pose=((RowingState)state).rowingPose();
     }
-    @Redirect(method="submit",at=@At(value="INVOKE",target="Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/resources/Identifier;III)V"))
-    private void measure(SubmitNodeCollector collector,Model<ArmRigModel.DrawState> model,Object data,PoseStack stack,Identifier texture,int light,int overlay,int outline) {
+    @Redirect(method="submit",at=@At(value="INVOKE",target="Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/resources/Identifier;IIILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
+    private void measure(SubmitNodeCollector collector,Model<ArmRigModel.DrawState> model,Object data,PoseStack stack,Identifier texture,int light,int overlay,int outline,net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay crumbling) {
         var snapshot=(ArmRigModel.DrawState)data;
         model.setupAnim(snapshot);
         if(!qa.rowing.CameraCapturePass.active&&probe$pose!=null) for(boolean left:new boolean[]{true,false}) {
@@ -32,6 +32,6 @@ public class SubmittedArmProbe {
             FrameContact.hand(left,stack.last().pose().transformPosition(new Vector3f(0,6f/16,0)));
             stack.popPose();
         }
-        collector.submitModel(model,snapshot,stack,texture,light,overlay,outline);
+        collector.submitModel(model,snapshot,stack,texture,light,overlay,outline,crumbling);
     }
 }

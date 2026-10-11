@@ -7,9 +7,9 @@ sourceSets.main {
 dependencies {
     minecraft libs.minecraft
     neoForge libs.neoforge
-    compileOnly 'maven.modrinth:entity-model-features:N7d5LddE'
-    compileOnly 'maven.modrinth:entitytexturefeatures:O8J3sxxp'
-    compileOnly 'maven.modrinth:real-camera:ROhlZqcT'
+    compileOnly 'maven.modrinth:entity-model-features:tgEvvPhr'
+    compileOnly 'maven.modrinth:entitytexturefeatures:b9RlCI9F'
+    compileOnly 'maven.modrinth:real-camera:FawEpnhn'
     compileOnly('tr7zw:FirstPersonModel:2.7.3') { artifact { name = 'firstperson-fabric'; type = 'jar' } }
     compileOnly('tr7zw:NotEnoughAnimations:1.12.5') { artifact { name = 'notenoughanimations-fabric'; type = 'jar' } }
     compileOnly('com.zigythebird:PlayerAnimationLibrary:1.2.8') { artifact { name = 'PlayerAnimationLibMerged'; type = 'jar' } }
@@ -29,3 +29,6 @@ tasks.named('sourcesJar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName = "${rootProject.archives_base_name}-${project.version}-neoforge-sources.jar"
 }
+
+// Public, compile-only optional action API; its implementation remains in Throw Weapons.
+dependencies { compileOnly project(':optional-api-stubs') }

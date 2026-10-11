@@ -18,9 +18,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class BoatRendererMixin {
     @Inject(method="extractRenderState(Lnet/minecraft/world/entity/vehicle/boat/AbstractBoat;Lnet/minecraft/client/renderer/entity/state/BoatRenderState;F)V",at=@At("RETURN"))
     private void rowing$capture(AbstractBoat boat,BoatRenderState state,float partial,CallbackInfo ci) {
-        BoatState row=(BoatState)state; row.rowingBoatPose(null); row.rowingLocalPlayer(null);
+        BoatState row=(BoatState)state; row.rowingBoatPose(null); row.rowingLocalPlayer(null);row.rowingRestorePaddles(false);
         if(boat.getControllingPassenger() instanceof AbstractClientPlayer driver) {
             var mc=Minecraft.getInstance(); boolean first=driver==mc.player && mc.options.getCameraType().isFirstPerson();
+            row.rowingRestorePaddles(first&&RowingClient.restoresPaddles()&&RowingClient.managesFirstPersonBoat());
             row.rowingBoatPose(RowingClient.capture(driver,partial,first));
             row.rowingLocalPlayer(RowingClient.firstPersonState(boat,partial));
         }
@@ -28,7 +29,8 @@ public class BoatRendererMixin {
     @SuppressWarnings({"rawtypes","unchecked"})
     @Inject(method="submit(Lnet/minecraft/client/renderer/entity/state/BoatRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",at=@At("HEAD"))
     private void rowing$local(BoatRenderState state,PoseStack stack,SubmitNodeCollector collector,CameraRenderState camera,CallbackInfo ci) {
-        var player=((BoatState)state).rowingLocalPlayer(); if(player==null || !camera.isFirstPerson) return;
+        // The player snapshot is captured only for the first-person controlling camera.
+        var player=((BoatState)state).rowingLocalPlayer(); if(player==null) return;
         var local=Minecraft.getInstance().player; if(local==null) return;
         AvatarRenderer renderer=(AvatarRenderer)Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(local);
         stack.pushPose();

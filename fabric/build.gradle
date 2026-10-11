@@ -1,9 +1,9 @@
 plugins { id 'dev.architectury.loom-no-remap' }
 sourceSets.main.java.srcDir rootProject.file('loader-adapters/src/main/java')
 dependencies {
-    compileOnly 'maven.modrinth:real-camera:ROhlZqcT'
-    compileOnly 'maven.modrinth:entity-model-features:N7d5LddE'
-    compileOnly 'maven.modrinth:entitytexturefeatures:O8J3sxxp'
+    compileOnly 'maven.modrinth:real-camera:FawEpnhn'
+    compileOnly 'maven.modrinth:entity-model-features:tgEvvPhr'
+    compileOnly 'maven.modrinth:entitytexturefeatures:b9RlCI9F'
     minecraft libs.minecraft
     implementation libs.fabric.loader
     implementation libs.fabric.api
@@ -31,3 +31,6 @@ tasks.named('sourcesJar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName = "${rootProject.archives_base_name}-${project.version}-fabric-sources.jar"
 }
+
+// Public, compile-only optional action API; its implementation remains in Throw Weapons.
+dependencies { compileOnly project(':optional-api-stubs') }
