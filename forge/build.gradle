@@ -35,3 +35,6 @@ dependencies {
     modCompileOnly('maven.modrinth:player-animation-library:yjxtkvnD') { transitive=false }
     modCompileOnly('maven.modrinth:playeranimator:HJZB6bmA') { transitive=false }
 }
+
+// Public, compile-only optional action API; its implementation remains in Throw Weapons.
+dependencies { compileOnly project(':optional-api-stubs') }

@@ -7,10 +7,12 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value=ArmRigModel.class,remap=false)
 public class SubmittedArmProbe {
+    @Inject(method="<init>",at=@At("RETURN"))
+    private void source(net.minecraft.client.model.PlayerModel source,CallbackInfo ci){qa.rowing.SkinSourceProbe.inspect(source);}
     @Unique private ArmRigModel.DrawState probe$state;
     @Inject(method="setupAnim",at=@At("RETURN"))
     private void state(ArmRigModel.DrawState state,CallbackInfo ci){probe$state=state;}
-    @Inject(method="renderToBuffer",at=@At("HEAD"))
+    @Inject(method="draw",at=@At("HEAD"))
     private void mesh(PoseStack stack,VertexConsumer consumer,int light,int overlay,int color,CallbackInfo ci){
         var context=RenderContext.current();
         if(context==null||context.rowingPose()==null||probe$state==null||qa.rowing.CameraCapturePass.active)return;

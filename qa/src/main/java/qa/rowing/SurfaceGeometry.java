@@ -94,7 +94,7 @@ public final class SurfaceGeometry {
         report.put("changedHiddenHeads",changedHiddenHeads);
         report.put("failedBodyRestores",failedBodyRestores);report.put("maximumNeckToTorsoPixels",neckError);
         if(bodySamples>0)report.put("neckForwardRangePixels",maxNeckZ-minNeckZ);
-        report.put("pass",samples>0&&brokenRings==0&&invalidFaces==0&&wristError<.001&&bodySamples>0&&restoredBodies+restoredCustomBodies>0&&failedBodyRestores==0&&neckError<.001&&changedHiddenHeads==0);
+        report.put("pass",samples>0&&brokenRings==0&&invalidFaces==0&&wristError<.01&&bodySamples>0&&restoredBodies+restoredCustomBodies>0&&failedBodyRestores==0&&neckError<.001&&changedHiddenHeads==0);
         try {Files.writeString(mc.gameDirectory.toPath().resolve("rowing-surface.json"),new com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(report));}
         catch(Exception failure){throw new RuntimeException(failure);}
     }

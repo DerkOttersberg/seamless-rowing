@@ -11,6 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Pseudo
 @Mixin(targets="traben.entity_model_features.models.parts.EMFModelPartVanilla",remap=false)
 public class EmfPaddleTransformProbe {
-    @Inject(method="translateAndRotate",at=@At("RETURN"))
+    @Inject(method={"translateAndRotate","method_22703","m_104299_"},at=@At("RETURN"))
     private void measure(PoseStack stack,CallbackInfo ci) {RenderedPaddles.inspect((ModelPart)(Object)this,stack);}
 }

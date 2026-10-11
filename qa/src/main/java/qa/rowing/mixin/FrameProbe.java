@@ -10,5 +10,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameRenderer.class)
 public class FrameProbe {
     @Inject(method="render",at=@At("HEAD"))
-    private void frame(DeltaTracker tracker,boolean active,CallbackInfo ci) { FrameContact.begin(); }
+    private void frame(DeltaTracker tracker,boolean active,CallbackInfo ci) { FrameContact.begin(); if(System.getProperty("qa.rowing.scenario","").equals("edge"))qa.rowing.EdgeScenario.renderCleanup(net.minecraft.client.Minecraft.getInstance()); }
 }
+

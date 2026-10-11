@@ -31,3 +31,6 @@ tasks.named('jar') {
 }
 tasks.named('remapJar') { archiveFileName="${rootProject.archives_base_name}-${project.version}-neoforge.jar" }
 tasks.named('remapSourcesJar') { archiveFileName="${rootProject.archives_base_name}-${project.version}-neoforge-sources.jar" }
+
+// Public, compile-only optional action API; its implementation remains in Throw Weapons.
+dependencies { compileOnly project(':optional-api-stubs') }

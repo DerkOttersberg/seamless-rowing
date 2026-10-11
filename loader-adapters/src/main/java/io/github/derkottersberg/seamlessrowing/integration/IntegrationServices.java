@@ -4,11 +4,15 @@ import io.github.derkottersberg.seamlessrowing.internal.ClientPlatformServices;
 /** Explicitly constructed by each loader, with no reflective discovery or runtime framework. */
 public abstract class IntegrationServices implements ClientPlatformServices {
 
-    private boolean initialized,nea,pal,playerAnimator,unsupported;
+    private boolean initialized,nea,pal,playerAnimator,seamlessThrow,unsupported;
     private String status="Compatibility is local to this client.";
     public final void integrations() {
         if(initialized)return;initialized=true;
         try {
+            if(isModLoaded("swordthrow")) {
+                String version=modVersion("swordthrow");
+                if(version.startsWith("2.1.0+")||version.startsWith("2.1.1+"))seamlessThrow=true;else unsupported=true;
+            }
             if(isModLoaded("punchy")&&!modVersion("punchy").equals("2.8e"))unsupported=true;
             if(isModLoaded("realcamera")) {
                 if(!modVersion("realcamera").equals("0.7.8-beta"))unsupported=true;
@@ -40,7 +44,9 @@ public abstract class IntegrationServices implements ClientPlatformServices {
                 : (nea ? "NEA priority 1501. " : "")+(isModLoaded("firstperson") ? "FirstPersonModel. " : "")+(pal ? "PAL priority respected." : "");
     }
     public boolean animationSchedulerActive(){return nea;}
+    public boolean groupedFirstPersonHands(){return isModLoaded("hold-my-items");}
     public boolean paddleVisibilityHandoff(){return isModLoaded("punchy")&&modVersion("punchy").equals("2.8e");}
+    public boolean customBoatGeometry(){return isModLoaded("entity_model_features")&&EmfAdapter.customBoat();}
     public boolean unsupportedAnimationIntegration(){return unsupported;}
     public String integrationStatus(){return status;}
     public final void resourcesReloaded(net.minecraft.server.packs.resources.ResourceManager resources) {
@@ -56,9 +62,9 @@ public abstract class IntegrationServices implements ClientPlatformServices {
         if(isModLoaded("entity_model_features"))io.github.derkottersberg.seamlessrowing.integration.EmfAdapter.prepare(model);
     }
     public boolean externalAnimationActive(net.minecraft.client.player.AbstractClientPlayer player) {
-        if(!pal&&!playerAnimator) return false;
-        try{return pal&&PalAdapter.active(player)||playerAnimator&&PlayerAnimatorAdapter.active(player);}
-        catch(RuntimeException|LinkageError invalid){unsupported=true;status="PAL rig unavailable: rowing safely disabled.";
+        if(!pal&&!playerAnimator&&!seamlessThrow) return false;
+        try{return seamlessThrow&&SeamlessThrowAdapter.active(player)||pal&&PalAdapter.active(player)||playerAnimator&&PlayerAnimatorAdapter.active(player);}
+        catch(RuntimeException|LinkageError invalid){unsupported=true;status="External action API unavailable: rowing safely disabled.";
             org.slf4j.LoggerFactory.getLogger("Seamless Rowing").warn(status,invalid);return true;}
     }
     public boolean customPlayerModel(net.minecraft.client.model.PlayerModel model) {

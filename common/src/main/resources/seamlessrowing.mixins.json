@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "ModelPartAccess",
+    "SurfaceRenderMixin",
     "PolygonAccess",
     "LivingRendererAccess",
     "PlayerRendererMixin",
@@ -16,6 +17,7 @@
     "ArmorLayerMixin",
     "RaftModelMixin",
     "FirstPersonLayersMixin",
+    "FirstPersonBaseMixin",
     "FirstPersonNameMixin"
   ],
   "injectors": {
@@ -23,3 +25,4 @@
   },
   "refmap": "seamlessrowing.refmap.json"
 }
+

@@ -11,3 +11,5 @@ sourceSets.main { java { srcDir rootProject.file('qa/src/main/java'); exclude '*
 loom { accessWidenerPath=rootProject.file('common/src/main/resources/seamlessrowing.accesswidener'); mixin { useLegacyMixinAp=true; defaultRefmapName='rowing-qa.refmap.json' }; mods { rowingqa { sourceSet sourceSets.main } } }
 tasks.named('jar') { archiveFileName='seamless-rowing-qa-forge-dev.jar'; manifest { attributes 'MixinConfigs':'rowing-qa.mixins.json' } }
 tasks.named('remapJar') { archiveFileName='seamless-rowing-qa-forge.jar' }
+
+dependencies { compileOnly project(':optional-api-stubs') }

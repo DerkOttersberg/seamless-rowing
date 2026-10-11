@@ -15,10 +15,19 @@
     "SkinProbe",
     "PaddleSoundProbe",
     "ShutdownProbe",
-    "BodySurfaceProbe"
+    "SurfaceSubmissionProbe",
+    "FirstPersonBodyProbe",
+    "EmfHeadCompileProbe",
+    "NativeHeadCompileProbe",
+    "VanillaHandsProbe",
+    "BodySurfaceProbe",
+    "SubmittedBodyProbe",
+    "LocalHeadProbe"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "refmap": "rowing-qa.refmap.json"
 }
+
+

@@ -26,7 +26,8 @@ public final class ArmRigModel extends Model {
         leftLower=left.getChild("lower"); rightLower=right.getChild("lower");
     }
     public ModelPart root(){return root;}
-    @Override public void renderToBuffer(com.mojang.blaze3d.vertex.PoseStack stack,com.mojang.blaze3d.vertex.VertexConsumer consumer,int light,int overlay,int color){root.render(stack,consumer,light,overlay,color);}
+    @Override public void renderToBuffer(com.mojang.blaze3d.vertex.PoseStack stack,com.mojang.blaze3d.vertex.VertexConsumer consumer,int light,int overlay,int color){draw(stack,consumer,light,overlay,color);}
+    private void draw(com.mojang.blaze3d.vertex.PoseStack stack,com.mojang.blaze3d.vertex.VertexConsumer consumer,int light,int overlay,int color){SurfaceRenderer.render(root,stack,consumer,light,overlay,color);}
     private static ModelPart root(PlayerModel model) {
         return new ModelPart(List.of(),Map.of("left",arm(model.leftArm,model.leftSleeve),"right",arm(model.rightArm,model.rightSleeve)));
     }
@@ -66,6 +67,7 @@ public final class ArmRigModel extends Model {
         upper.getChild("sleeve").visible=bone.sleeve&&!firstPerson;
     }
     private static void rotate(ModelPart part,Quaternionf q) {
-        Vector3f angles=q.getEulerAnglesZYX(new Vector3f()); part.setRotation(angles.x,angles.y,angles.z);
+        Vector3f angles=io.github.derkottersberg.seamlessrowing.math.ModelOrientation.angles(q);part.setRotation(angles.x,angles.y,angles.z);
     }
 }
+
