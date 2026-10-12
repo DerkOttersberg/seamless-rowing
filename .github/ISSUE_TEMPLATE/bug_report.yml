@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a rowing animation or compatibility problem.
+title: '[Bug]: '
+labels: [bug]
+body:
+  - type: input
+    id: versions
+    attributes:
+      label: Minecraft, Seamless Rowing and loader versions
+      placeholder: Minecraft 1.21.1, Rowing 0.1.0, NeoForge 21.1.255
+    validations:
+      required: true
+  - type: dropdown
+    id: camera
+    attributes:
+      label: Affected view
+      options: [First person, Third person behind, Third person front, Other player, Multiple views]
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce and expected behavior
+      description: Include boat type, skin model, armor, handedness and rowing settings when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: integrations
+    attributes:
+      label: Other mods, resource packs and shaders
+      description: Include their versions, especially player animation or model mods.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots, footage or relevant log excerpt
