@@ -4,6 +4,8 @@ Client-only boat rowing animation with paddle-driven articulated arms, original 
 
 ## Accepted release 0.1.0
 
+[Seamless Rowing on CurseForge](https://www.curseforge.com/minecraft/mc-mods/seamless-rowing/preview) was submitted with all 11 accepted builds on 13 October 2026. Every file selects automatic publication after approval. The new project and files are awaiting review; submission does not imply public availability. See the [upload receipt](docs/CURSEFORGE_RELEASE.md) for file IDs, hashes, GIFs and observed moderation states.
+
 **0.1.0** retains the approved spine stroke and continuous textured elbows. The four version branches contain all 11 Fabric, Forge and NeoForge builds in the table below. All 11 builds passed the required packaged native gates against their final JAR hashes, including two-client dedicated-server and mixed-installation tests. Current results and limitations are recorded in the packaged acceptance report; historical previews remain separate. Fabric requires Fabric API; Forge and NeoForge use their native APIs. SeamlessLib and a runtime animation framework are not required. Install Rowing on clients. Each viewer needs it to see the animation; a server without Rowing uses ordinary vanilla boat synchronization.
 
 Use normal boat controls. Only the controlling rider animates. Forward/turning strokes follow native paddles; backwards-only movement keeps vanilla behavior. Item use releases both hands, and attacking releases the active hand. Hold My Items receives a complete first-person handoff during attacks because its grouped animation controls both hands. Selected items are hidden visually while their hand rows; inventory and boat physics are unchanged. Sounds remain vanilla, including resource-pack replacements.
@@ -35,4 +37,4 @@ One repository per product, with one branch per Minecraft line containing its lo
 | 1.21.1 | Fabric, Forge, NeoForge | 21 |
 | 1.20.1 | Fabric, Forge | 17 |
 
-All four native ports passed packaged singleplayer, multiplayer, settings, recovery and applicable compatibility gates. The release bundle contains exact hashes, source commits and acceptance evidence. GitHub publication and CurseForge uploads remain separate actions.
+All four native ports passed packaged singleplayer, multiplayer, settings, recovery and applicable compatibility gates. The release bundle contains exact hashes, source commits and acceptance evidence. GitHub publication remains a separate action. CurseForge submission is recorded in the upload receipt above.
