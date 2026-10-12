@@ -1,0 +1,62 @@
+name: Build supported loaders
+
+on:
+  push:
+    branches: ['26.3', '26.2', '1.21.1', '1.20.1']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rowing-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  wrapper-validation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: gradle/actions/wrapper-validation@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
+
+  build:
+    name: Common checks and this branch's loaders
+    needs: wrapper-validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up the Gradle launcher
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
+      - name: Build and verify all loader modules in this version branch
+        run: |
+          chmod +x gradlew
+          ./gradlew clean check build --no-daemon --stacktrace
+      - name: Preserve unit and verification reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rowing-${{ github.ref_name }}-verification-reports
+          if-no-files-found: ignore
+          path: |
+            **/build/reports/**
+            **/build/test-results/**
+      - name: Preserve CI builds for inspection
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rowing-${{ github.ref_name }}-ci-builds
+          if-no-files-found: error
+          path: |
+            fabric/build/libs/*-fabric.jar
+            forge/build/libs/*-forge.jar
+            neoforge/build/libs/*-neoforge.jar
+
+# The branch catalog selects Java 17, 21 or 25 for compilation; Foojay resolves
+# that toolchain. Gradle 9.6 itself runs on Java 25. The root checks inspect only
+# the loader modules supported by the checked-out branch (two on 1.20.1).
+# Hosted builds do not replace the packaged client/server and visual gates.

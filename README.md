@@ -2,6 +2,8 @@
 
 Client-only boat rowing animation with paddle-driven articulated arms, original fixed-seat torso poses and native skin/armor rendering. All Rights Reserved, with modpack inclusion permission in `LICENSE`.
 
+Source: [DerkOttersberg/seamless-rowing](https://github.com/DerkOttersberg/seamless-rowing). The default branch is `26.3`; maintained version branches are `26.3`, `26.2`, `1.21.1` and `1.20.1`, each containing its supported loader modules. See [contribution guidance](CONTRIBUTING.md) for branch targets and build checks.
+
 ## Accepted release 0.1.0
 
 [Seamless Rowing on CurseForge](https://www.curseforge.com/minecraft/mc-mods/seamless-rowing/preview) was submitted with all 11 accepted builds on 13 October 2026. Every file selects automatic publication after approval. The new project and files are awaiting review; submission does not imply public availability. See the [upload receipt](docs/CURSEFORGE_RELEASE.md) for file IDs, hashes, GIFs and observed moderation states.
@@ -37,4 +39,4 @@ One repository per product, with one branch per Minecraft line containing its lo
 | 1.21.1 | Fabric, Forge, NeoForge | 21 |
 | 1.20.1 | Fabric, Forge | 17 |
 
-All four native ports passed packaged singleplayer, multiplayer, settings, recovery and applicable compatibility gates. The release bundle contains exact hashes, source commits and acceptance evidence. GitHub publication remains a separate action. CurseForge submission is recorded in the upload receipt above.
+All four native ports passed packaged singleplayer, multiplayer, settings, recovery and applicable compatibility gates. The release bundle contains exact hashes, source commits and acceptance evidence. GitHub's build workflow checks the source and this branch's loader modules; it does not replace packaged visual and multiplayer acceptance. CurseForge submission is recorded in the upload receipt above.
