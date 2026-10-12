@@ -1,0 +1,15 @@
+name: Feature request
+description: Suggest a rowing animation or compatibility improvement.
+title: '[Feature]: '
+labels: [enhancement]
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior and why it helps
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Relevant Minecraft, loader and mod versions
