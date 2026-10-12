@@ -17,6 +17,18 @@ if sys.argv[1]=='pause':
         if any(Path(command.split()[-1]).name==name for name in keep):continue
         os.kill(int(pid),signal.SIGSTOP);paused.append({'pid':int(pid),'command':command})
     record.write_text(json.dumps(paused,indent=2));print('Paused only',len(paused),'queue schedulers; game processes continue')
+elif sys.argv[1]=='resume-default':
+    remaining=[];resumed=[]
+    for task in json.loads(record.read_text()):
+        process=Path('/proc')/str(task['pid'])
+        if not process.exists():continue
+        actual=(process/'cmdline').read_bytes().replace(b'\0',b' ').decode().strip()
+        assert actual==task['command'],actual
+        if b'ISOLATED_CLIENT_LOCK_FILE=/tmp/seamless-rowing-legacy.lock' in (process/'environ').read_bytes():remaining.append(task)
+        else:os.kill(task['pid'],signal.SIGCONT);resumed.append(task)
+    temporary=record.with_suffix('.tmp');temporary.write_text(json.dumps(remaining,indent=2));temporary.replace(record)
+    (ROOT/'resumed-default-schedulers.json').write_text(json.dumps(resumed,indent=2))
+    print('Resumed',len(resumed),'default-slot schedulers; priority tests retain the other slot')
 elif sys.argv[1]=='resume':
     for task in json.loads(record.read_text()):
         path=Path('/proc')/str(task['pid'])/'cmdline'
@@ -25,4 +37,4 @@ elif sys.argv[1]=='resume':
             assert actual==task['command'],actual
             os.kill(task['pid'],signal.SIGCONT)
     record.rename(ROOT/'resumed-review-schedulers.json');print('Resumed owned queue schedulers')
-else:raise ValueError('Use pause or resume')
+else:raise ValueError('Use pause, resume-default or resume')

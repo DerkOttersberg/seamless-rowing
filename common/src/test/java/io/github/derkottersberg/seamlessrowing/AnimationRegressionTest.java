@@ -9,6 +9,27 @@ import org.joml.Vector3f;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AnimationRegressionTest {
+    @Test void bankedGripCrossingShoulderHeightKeepsTheElbowBranchAndContact() {
+        for(boolean left:new boolean[]{false,true}) {
+            float side=left?1:-1;
+            org.joml.Quaternionf previous=null;
+            for(int frame=0;frame<=400;frame++) {
+                Point3 shoulder=new Point3(side*6,0,0);
+                Point3 target=new Point3(side*8,-2+frame*.01,-4);
+                var pose=RowingArmKinematics.solve(shoulder,target,left,new Point3(side,-.5,1));
+                Vector3f upper=new Vector3f(0,6,0).rotate(pose.upper());
+                Vector3f localLower=new Vector3f(0,6,0).rotate(pose.lower());
+                Vector3f hand=new Vector3f(localLower).rotate(pose.upper()).add(upper).add(side*6,0,0);
+                assertTrue(new Vector3f(1,0,0).rotate(pose.upper()).x>0,"Banking must not reverse the hinge");
+                assertEquals(0,localLower.x,2e-5);
+                assertTrue(localLower.z<0);
+                assertEquals(6,upper.length(),2e-5);assertEquals(6,localLower.length(),2e-5);
+                assertTrue(hand.distance(new Vector3f((float)target.x(),(float)target.y(),(float)target.z()))<2e-5);
+                if(previous!=null)assertTrue(Math.abs(previous.dot(pose.upper()))>.999);
+                previous=pose.upper();
+            }
+        }
+    }
     @Test void intentionallyRelocatedHeadsArePreservedForFirstPersonModel() {
         assertTrue(TorsoMotion.attachedHead(0,0,0));assertTrue(TorsoMotion.attachedHead(0,4.2f,0));
         for(float offset:new float[]{-5000,5000,Float.NaN,Float.POSITIVE_INFINITY})assertFalse(TorsoMotion.attachedHead(0,offset,0));

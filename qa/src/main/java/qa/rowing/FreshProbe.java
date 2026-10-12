@@ -16,6 +16,8 @@ public final class FreshProbe {
         return root!=null&&root.containsCustomModel&&root.currentModelVariant!=0;
     }
     private static int rowing,wrongRowingVariant,customOutside,vanillaOutside;
+    public static boolean rowingCoverageReady(){return rowing>=15;}
+    public static boolean restoredCoverageReady(){return customOutside>=15;}
     public static void inspect(PlayerModel model,AvatarRenderState state) {
         if(!((Object)model instanceof IEMFModel emf))return;
         var root=emf.emf$getEMFRootModel();

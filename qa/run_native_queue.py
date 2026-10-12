@@ -37,7 +37,7 @@ for job in jobs:
         expected={'control':['rowing-fresh-behavior.json'],'suite':['rowing-suite.json','rowing-anatomy.json','rowing-surface.json'],'boat-fallback':['rowing-boat-fallback.json'],'edge':['rowing-edge.json','rowing-anatomy.json','rowing-surface.json'],'settings':['rowing-settings.json'],'lifecycle':['rowing-lifecycle.json','rowing-anatomy.json','rowing-surface.json'],'fallback':['rowing-fallback.json']}.get(scenario,
             ['rowing-anatomy.json','rowing-surface.json','rowing-matrix.json' if scenario=='matrix' else 'rowing-fresh-behavior.json'])
         result['reports']=reports
-        extra_reports=['rowing-paddle-visibility.json','rowing-fresh-model.json','rowing-first-person-ownership.json']
+        extra_reports=['rowing-paddle-visibility.json','rowing-fresh-model.json','rowing-first-person-ownership.json','rowing-armor-visibility.json']
         result['pass']=run.returncode==0 and all(reports.get(p,{}).get('pass') is True for p in expected) and all(reports[p].get('pass') is True for p in extra_reports if p in reports and scenario not in ('settings','fallback','control'))
         if scenario in ('fresh','matrix','suite','lifecycle','edge'):
             result['pass'] &= reports.get('rowing-native-surfaces.json',{}).get('pass') is True

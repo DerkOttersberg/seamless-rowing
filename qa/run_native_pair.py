@@ -45,7 +45,8 @@ def terminated(signum,frame):raise SystemExit(128+signum)
 signal.signal(signal.SIGTERM,terminated)
 try:
     path=pair/'server-console.log';out=path.open('w');logs.append(out)
-    server=subprocess.Popen(['/usr/lib/jvm/java-'+metadata['java']+'-openjdk-amd64/bin/java','-Xmx768M','-XX:ActiveProcessorCount=2','-jar','server.jar','--safeMode','nogui'],cwd=pair/'server',stdout=out,stderr=subprocess.STDOUT,start_new_session=True);processes.append(server)
+    server_args=metadata.get('serverArguments') or ['-jar','server.jar','--safeMode','nogui']
+    server=subprocess.Popen(['/usr/lib/jvm/java-'+metadata['java']+'-openjdk-amd64/bin/java','-Xmx768M','-XX:ActiveProcessorCount=2']+server_args,cwd=pair/'server',stdout=out,stderr=subprocess.STDOUT,start_new_session=True);processes.append(server)
     wait(server,path,'Done (')
     clients=[]
     def launch(role):
@@ -95,7 +96,8 @@ try:
         actual={f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/metadata['profiles'][role]/'mods').glob('*.jar')}
         if actual!=before[role]:raise RuntimeError('Client JARs changed during test: '+role)
     passed=all(r['pass'] for r in results.values()) and all(geometry[role].get(report,{}).get('pass') is True for role in (('rower',) if mixed else results) for report in ('rowing-anatomy.json','rowing-surface.json','rowing-native-surfaces.json'))
-    (pair/'pair-results.json').write_text(json.dumps({'serverWithoutMods':True,'lateTrackingDuringEstablishedStroke':True,'mixedClientInstallation':mixed,'minecraft':metadata['minecraft'],'loader':metadata['loader'],'reconnectFromSavedServer':metadata.get('reconnectFrom'),'hashes':before,'results':results,'geometry':geometry,'pass':passed},indent=2))
+    server_mods=metadata.get('serverModHashes',{})
+    (pair/'pair-results.json').write_text(json.dumps({'serverWithoutMods':not bool(server_mods),'serverWithoutRowing':not any('seamless-rowing' in filename for filename in server_mods),'serverModHashes':server_mods,'lateTrackingDuringEstablishedStroke':True,'mixedClientInstallation':mixed,'minecraft':metadata['minecraft'],'loader':metadata['loader'],'reconnectFromSavedServer':metadata.get('reconnectFrom'),'hashes':before,'results':results,'geometry':geometry,'pass':passed},indent=2))
     print('ROWING_PAIR_COMPLETE',results,flush=True)
     print(rcon('save-all flush'));print(rcon('stop'));server.wait(timeout=90)
 finally:

@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ShutdownProbe {
     @Inject(method="stop",at=@At("HEAD"))
     private void anatomy(CallbackInfo ci) {
+        qa.rowing.FrameCadence.write((Minecraft)(Object)this);
         qa.rowing.SurfaceSubmission.write((Minecraft)(Object)this);
         qa.rowing.FirstPersonOwnership.write((Minecraft)(Object)this);
         qa.rowing.PaddleVisibility.write((Minecraft)(Object)this);

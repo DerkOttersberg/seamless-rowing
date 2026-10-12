@@ -9,11 +9,19 @@ import java.nio.file.Files;
 import java.util.Set;
 
 public final class FreshScenario {
+    private static int shaderCoverageWaitTicks;
     private static int tick,owned,useReleased,stopped,walking,realCameraTicks;private static boolean reloadDone;
     private static java.util.concurrent.CompletableFuture<Void> reload;
     public static void tick(Minecraft mc) {
         if(mc.isPaused()||mc.gui.screen()!=null||mc.player==null||mc.level==null)return;
         if(tick==0&&mc.player.getVehicle()==null)return;
+        // Shader compilation can let many client ticks pass between rendered
+        // frames. Preserve real controls while waiting for native model samples.
+        if(Boolean.getBoolean("qa.rowing.shaderCoverage")&&
+                (tick==180&&!FreshProbe.rowingCoverageReady()||tick==212&&!FreshProbe.restoredCoverageReady())){
+            if(++shaderCoverageWaitTicks>400)throw new IllegalStateException("Shader native model coverage timed out");
+            return;
+        }
         tick++;
         if(tick==1&&Boolean.getBoolean("qa.rowing.realcamera"))com.xtracr.realcamera.config.ConfigFile.config().enabled=true;
         if(Boolean.getBoolean("qa.rowing.realcamera")&&com.xtracr.realcamera.RealCameraCore.isActive())realCameraTicks++;
@@ -49,7 +57,7 @@ public final class FreshScenario {
             player.teleportTo(level,-3,-57,1,Set.of(),0,0,true);
         });
         if(tick>225&&mc.player.getVehicle()==null&&pose==null)walking++;
-        if(tick%2==0)Screenshot.grab(mc.gameDirectory,String.format("fresh-%03d.png",tick),mc.gameRenderer.mainRenderTarget(),1,message->{});
+        if(tick%2==0&&!Boolean.getBoolean("qa.rowing.cadence"))Screenshot.grab(mc.gameDirectory,String.format("fresh-%03d.png",tick),mc.gameRenderer.mainRenderTarget(),1,message->{});
         if(tick==275) {
             mc.options.keyUp.setDown(false);mc.options.keyUse.setDown(false);mc.options.keyLeft.setDown(false);
             boolean pass=owned>40&&useReleased>3&&stopped>5&&walking>20&&reloadDone&&FrameContact.samples()>10&&FrameContact.maximum()<=1

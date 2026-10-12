@@ -29,8 +29,10 @@ def main():
     p.add_argument('--name',required=True);p.add_argument('--fixture',type=Path,required=True);p.add_argument('--extra-mods',type=Path)
     p.add_argument('--fresh-pack',type=Path);p.add_argument('--scenario',default='');p.add_argument('--realcamera',action='store_true')
     p.add_argument('--shader-pack',type=Path);p.add_argument('--backend',choices=('opengl','vulkan'));p.add_argument('--loader-pin');p.add_argument('--shader-profile',default='POTATO');p.add_argument('--width',type=int,default=1280);p.add_argument('--height',type=int,default=720)
+    p.add_argument('--max-fps',type=int,default=30)
     args=p.parse_args();repo=args.repo.resolve();loader=args.loader
     if not 320<=args.width<=1920 or not 240<=args.height<=1080:raise ValueError('Invalid private-display resolution')
+    if not 10<=args.max_fps<=240:raise ValueError('Invalid frame cap')
     if not re.fullmatch('[a-zA-Z0-9-]+',args.name):raise ValueError('Invalid run name')
     ownership=json.loads((ROOT/'ownership.json').read_text(encoding='utf-8-sig'))
     if ownership['distro']!='SeamlessRowingPortsQA-20261011':raise RuntimeError('Unowned test root')
@@ -58,7 +60,7 @@ def main():
             if jar.name!=name or sha(jar)!=expected:raise ValueError('Integration hash mismatch')
             shutil.copy2(jar,profile/'mods'/name)
     shutil.copytree(args.fixture,profile/'saves/rowing-world')
-    options='renderDistance:4\nsimulationDistance:5\nmaxFps:30\nvsync:false\npauseOnLostFocus:false\nguiScale:2\nfov:0.0\ncloudStatus:0\nparticles:2\n'
+    options=f'renderDistance:4\nsimulationDistance:5\nmaxFps:{args.max_fps}\nenableVsync:false\npauseOnLostFocus:false\nguiScale:2\nfov:0.0\ncloudStatus:0\nparticles:2\n'
     if args.fresh_pack:
         (profile/'resourcepacks').mkdir();shutil.copy2(args.fresh_pack,profile/'resourcepacks'/args.fresh_pack.name)
         options+='resourcePacks:'+json.dumps(['vanilla','file/'+args.fresh_pack.name])+'\n'
@@ -159,6 +161,8 @@ def main():
     jvm=arguments(info,'jvm')+arguments(modded,'jvm')
     if '-cp' not in jvm and '-classpath' not in jvm:jvm+=['-cp',':'.join(classpath)]
     command=[java,'-Xmx768M','-XX:ActiveProcessorCount=2','-Dqa.rowing.scenario='+args.scenario]
+    if args.max_fps!=30:command+=['-Dqa.rowing.cadence=true']
+    if args.shader_pack:command+=['-Dqa.rowing.shaderCoverage=true']
     if args.realcamera:command+=['-Dqa.rowing.realcamera=true']
     command+=jvm+[modded['mainClass']]+arguments(info,'game')+arguments(modded,'game')+['--quickPlaySingleplayer','rowing-world']
     if mc.startswith('26.'):command+=['--graphicsBackend',args.backend or 'vulkan']
