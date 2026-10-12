@@ -12,19 +12,21 @@ public final class RowingArmKinematics {
         @Override public Quaternionf lower() { return new Quaternionf(lower); }
     }
     public static Pose solve(Point3 shoulder,Point3 target,boolean left,Point3 shaft) {
-        // Elbows stay down and behind the shoulder-to-hand line, with modest lateral clearance.
-        // The old forward/outward pole solved contact but selected the reverse elbow branch.
-        // A fixed downward component can invert the hinge when a handle moves behind
-        // the shoulder. Posterior bias naturally lowers the elbow on forward reaches.
-        var joints=ArmSolver.solve(shoulder,target,new Point3(left?.25:-.25,0,1),6,6);
+        // Rotate the bend pole with the sagittal reach direction. A fixed posterior
+        // pole reverses the hinge when native boat banking lifts a grip above the shoulder.
+        Point3 reach=target.subtract(shoulder);
+        double sagittal=Math.hypot(reach.y(),reach.z());
+        Point3 pole=sagittal>1e-6 ? new Point3(left?.25:-.25,-reach.z()/sagittal,reach.y()/sagittal)
+                : new Point3(left?.25:-.25,0,1);
+        var joints=ArmSolver.solve(shoulder,target,pole,6,6);
         Vector3f upperY=vector(joints.elbow().subtract(shoulder)).normalize();
         Vector3f lowerY=vector(joints.hand().subtract(joints.elbow())).normalize();
         Vector3f hinge=new Vector3f(lowerY).cross(upperY).normalize();
         Quaternionf upper=frame(hinge,upperY);
-        Quaternionf lowerWorld=frame(hinge,lowerY);
-        // Both halves share the hinge axis. Independent rotationTo frames can twist the
-        // joint so that a correctly positioned elbow still appears to bend backwards.
-        Quaternionf lower=new Quaternionf(upper).conjugate().mul(lowerWorld);
+        // Construct the hinge directly rather than multiplying near-collinear frames;
+        // the latter introduces sideways bend noise near full extension.
+        float bend=(float)Math.atan2(new Vector3f(upperY).cross(lowerY).length(),upperY.dot(lowerY));
+        Quaternionf lower=new Quaternionf().rotationX(-bend);
         Vector3f lowerZ=new Vector3f(hinge).cross(lowerY).normalize();
         Vector3f paddle=vector(shaft);
         float across=paddle.dot(hinge),forward=paddle.dot(lowerZ);

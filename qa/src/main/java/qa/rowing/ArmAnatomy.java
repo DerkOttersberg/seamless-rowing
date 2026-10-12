@@ -14,7 +14,8 @@ public final class ArmAnatomy {
     public static void measure(ArmRigModel.Bone bone,boolean left) {
         Vector3f lower=new Vector3f(0,6,0).rotate(bone.lower());
         Vector3f upper=new Vector3f(0,6,0).rotate(bone.upper());
-        if(new Vector3f(1,0,0).rotate(bone.upper()).x<-.001) invertedHinge++;
+        float hingeX=new Vector3f(1,0,0).rotate(bone.upper()).x;
+        if(hingeX<-.001){invertedHinge++;if(invertedHinge<=8)System.out.println("ANATOMY_INVERTED left="+left+" hingeX="+hingeX+" shoulder="+bone.shoulder()+" upper="+upper+" lower="+lower+" phase="+EdgeScenario.debugState());}
         samples++;if(lower.z>.001) reverse++;if(Math.abs(lower.x)>.001) sideways++;
         maxSideways=Math.max(maxSideways,Math.abs(lower.x));
         maxLengthError=Math.max(maxLengthError,Math.max(Math.abs(upper.length()-6),Math.abs(lower.length()-6)));

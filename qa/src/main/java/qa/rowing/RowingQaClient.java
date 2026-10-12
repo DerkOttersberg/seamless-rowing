@@ -45,7 +45,7 @@ public final class RowingQaClient {
             boat.setPos(0,-58.1,0);level.addFreshEntity(boat);player.startRiding(boat,true);
             server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),"time set 6000");
         });
-        if(System.getProperty("qa.rowing.scenario","").matches("fresh|control")) {FreshScenario.tick(mc);return;}
+        if(System.getProperty("qa.rowing.scenario","").matches("fresh|control|armor")) {FreshScenario.tick(mc);return;}
         if(mc.player.getVehicle()!=null&&System.getProperty("qa.rowing.scenario","").equals("lifecycle")){LifecycleScenario.tick(mc);return;}
         if(mc.player.getVehicle()!=null&&System.getProperty("qa.rowing.scenario","").equals("fallback")){FallbackScenario.tick(mc);return;}
         if(System.getProperty("qa.rowing.scenario","").equals("edge")){EdgeScenario.tick(mc);return;}
