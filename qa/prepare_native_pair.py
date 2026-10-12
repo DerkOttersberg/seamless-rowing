@@ -14,9 +14,10 @@ assert json.loads((ROOT/'ownership.json').read_text(encoding='utf-8-sig'))['dist
 pair=ROOT/a.name;pair.mkdir(exist_ok=False);profiles={}
 for role,user in [('rower','RowQA'),('observer','ObserverQA')]:
     run=a.name+'-'+role
-    cmd=['python3',str(QA/'prepare_native_runtime.py'),'--repo',a.repo,'--loader',a.loader,'--name',run,'--fixture',a.fixture,'--width',str(a.width),'--height',str(a.height)]
+    observer_vanilla=role=='observer' and a.vanilla_observer
+    cmd=['python3',str(QA/'prepare_native_runtime.py'),'--repo',a.repo,'--loader','vanilla' if observer_vanilla else a.loader,'--name',run,'--fixture',a.fixture,'--width',str(a.width),'--height',str(a.height)]
     for key in ('extra_mods','fresh_pack','backend','loader_pin'):
-        if getattr(a,key):cmd+=['--'+key.replace('_','-'),getattr(a,key)]
+        if getattr(a,key) and not observer_vanilla:cmd+=['--'+key.replace('_','-'),getattr(a,key)]
     subprocess.run(cmd,check=True,timeout=900)
     profile=ROOT/('client-'+run);profiles[role]=profile.name
     if role=='observer' and a.vanilla_observer:

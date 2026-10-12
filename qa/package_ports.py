@@ -98,7 +98,7 @@ for file in stage.glob('*-*.log'):
 for directory in stage.iterdir():
     if not directory.is_dir() or not (directory/'metadata.json').is_file() or not (directory/'server').is_dir():continue
     destination=out/'evidence/logs'/directory.name;destination.mkdir()
-    for filename in ('metadata.json','pair-results.json','rower-console.log','observer-console.log','server-console.log'):
+    for filename in ('metadata.json','pair-results.json','rower.json','observer.json','rower-console.log','observer-console.log','server-console.log'):
         file=directory/filename
         if file.is_file():shutil.copy2(file,destination/filename)
 (out/'evidence/input-manifests').mkdir()

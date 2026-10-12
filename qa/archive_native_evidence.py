@@ -30,7 +30,7 @@ for name,r in records.items():
     for file in stage.glob(name+'-*.log'):shutil.copy2(file,out/file.name)
     pair=stage/name
     if (pair/'server').is_dir():
-        for filename in ('metadata.json','pair-results.json','rower-console.log','observer-console.log','server-console.log'):
+        for filename in ('metadata.json','pair-results.json','rower.json','observer.json','rower-console.log','observer-console.log','server-console.log'):
             source=pair/filename
             if source.is_file():shutil.copy2(source,out/filename)
         profiles=json.loads((pair/'metadata.json').read_text())['profiles']
@@ -39,6 +39,9 @@ for name,r in records.items():
         profile=stage/profile_name;target=out/role;target.mkdir(exist_ok=True)
         for source in list(profile.glob('rowing*.json'))+[profile/'jar-hashes-before.json']:
             if source.is_file():shutil.copy2(source,target/source.name)
+        settings_frames=profile/'screenshots'
+        for source in settings_frames.glob('settings-scale-*.png'):
+            media=target/'screenshots';media.mkdir(exist_ok=True);shutil.copy2(source,media/source.name)
         if name not in a.visual:continue
         screenshots=profile/'screenshots'
         if not screenshots.is_dir():continue

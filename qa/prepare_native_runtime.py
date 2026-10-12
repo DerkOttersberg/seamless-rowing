@@ -25,7 +25,7 @@ def rules_allow(rules):
         result=rule['action']=='allow'
     return result
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--repo',type=Path,required=True);p.add_argument('--loader',choices=('fabric','forge','neoforge'),required=True)
+    p=argparse.ArgumentParser();p.add_argument('--repo',type=Path,required=True);p.add_argument('--loader',choices=('fabric','forge','neoforge','vanilla'),required=True)
     p.add_argument('--name',required=True);p.add_argument('--fixture',type=Path,required=True);p.add_argument('--extra-mods',type=Path)
     p.add_argument('--fresh-pack',type=Path);p.add_argument('--scenario',default='');p.add_argument('--realcamera',action='store_true')
     p.add_argument('--shader-pack',type=Path);p.add_argument('--backend',choices=('opengl','vulkan'));p.add_argument('--loader-pin');p.add_argument('--shader-profile',default='POTATO');p.add_argument('--width',type=int,default=1280);p.add_argument('--height',type=int,default=720)
@@ -51,7 +51,9 @@ def main():
     profile.mkdir();(profile/'mods').mkdir();(profile/'config').mkdir()
     gameplay=repo/loader/'build/libs'/f'seamless-rowing-{mod_version}-{loader}.jar'
     qa=repo/('qa' if loader=='fabric' else 'qa-'+loader)/'build/libs'/('seamless-rowing-qa.jar' if loader=='fabric' else 'seamless-rowing-qa-'+loader+'.jar')
-    for jar in (gameplay,qa):shutil.copy2(jar,profile/'mods'/jar.name)
+    if loader=='vanilla' and (args.extra_mods or args.fresh_pack or args.shader_pack):raise ValueError('Vanilla observer must have no third-party inputs')
+    if loader!='vanilla':
+        for jar in (gameplay,qa):shutil.copy2(jar,profile/'mods'/jar.name)
     if args.extra_mods:
         inputs=json.loads((args.extra_mods/'manifest.json').read_text())
         if inputs['minecraft']!=mc or inputs['loader']!=loader:raise ValueError('Integration matrix mismatch')
@@ -77,7 +79,7 @@ def main():
         (profile/'config/oculus.properties').write_text('enableShaders=true\nshaderPack='+args.shader_pack.name+'\n')
     info_path=Path('/mnt/c/Users/derko/.gradle/caches/fabric-loom')/mc/'mojang_minecraft_info.json'
     info=json.loads(info_path.read_text())
-    previous=ROOT/'runtimes'/f'{mc}-{loader}-{pins["fabric-loader" if loader=="fabric" else loader]}'
+    previous=ROOT/'runtimes'/(mc+'-vanilla-original' if loader=='vanilla' else f'{mc}-{loader}-{pins["fabric-loader" if loader=="fabric" else loader]}')
     # Resource baking performs many small ZIP reads. Keep immutable inputs on Linux storage.
     runtime=Path('/opt/seamless-rowing-ports-qa/runtimes')/previous.name
     if not runtime.exists() and (previous/'installed-profile.json').is_file():
@@ -92,7 +94,8 @@ def main():
     original=fetch(info['downloads']['client']['url'],version_dir/(mc+'.jar'),info['downloads']['client']['sha1'])
     java='/usr/lib/jvm/java-'+pins['java']+'-openjdk-amd64/bin/java'
     installed=runtime/'installed-profile.json'
-    if installed.exists():modded=json.loads(installed.read_text())
+    if loader=='vanilla':modded={'id':mc,'mainClass':info['mainClass'],'libraries':[],'arguments':{'jvm':[],'game':[]}}
+    elif installed.exists():modded=json.loads(installed.read_text())
     elif loader=='fabric':
         url=f'https://meta.fabricmc.net/v2/versions/loader/{mc}/{pins["fabric-loader"]}/profile/json'
         modded=json.loads(fetch(url,runtime/'fabric-profile.json').read_text());installed.write_text(json.dumps(modded))
