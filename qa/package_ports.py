@@ -112,7 +112,7 @@ instructions=['# Install Seamless Rowing 0.1.0','','Choose one JAR matching both
 instructions+=['| '+c['minecraft']+' | '+c['loader']+' | ['+c['filename']+']('+c['jar']+') |' for c in manifest['cells']]
 instructions+=['','Fresh Player Extension 1.1 is supported with the tested EMF/ETF versions. Fresh keeps its player model outside rowing; the verified vanilla rig is used during rowing. Exact optional combinations, native measurements and limitations are recorded in `PORT_ACCEPTANCE.md` and `evidence`. Unknown custom rigs preserve their existing renderer.','', 'The bundle includes acceptance media and reports. Only files under `mods` are installed in Minecraft. All Rights Reserved, with permission for modpack inclusion as described in `LICENSE`.','']
 (out/'INSTALL.md').write_text('\n'.join(instructions))
-archive=out.with_suffix('.zip')
+archive=out.with_name(out.name+'.zip')
 with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as zipout:
     for file in out.rglob('*'):
         if file.is_file():zipout.write(file,file.relative_to(out))
