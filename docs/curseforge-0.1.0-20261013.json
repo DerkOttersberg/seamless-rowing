@@ -1,0 +1,355 @@
+{
+  "product": "Seamless Rowing",
+  "projectId": 1742062,
+  "owner": "Seamlessmods",
+  "version": "0.1.0",
+  "publicUrl": "https://www.curseforge.com/minecraft/mc-mods/seamless-rowing",
+  "previewUrl": "https://www.curseforge.com/minecraft/mc-mods/seamless-rowing/preview",
+  "license": "All Rights Reserved",
+  "thirdPartyDistribution": true,
+  "descriptionStyleSources": [
+    "https://www.curseforge.com/minecraft/mc-mods/pet-your-dog",
+    "https://www.curseforge.com/minecraft/mc-mods/breath-fog",
+    "https://www.curseforge.com/minecraft/mc-mods/throw-weapons"
+  ],
+  "descriptionStyle": "Original product banner; author badges; About; in-game GIFs; Features; Settings; AI disclosure; existing other-mod banners. Adds installation and precise compatibility information.",
+  "projectStatus": "New project awaiting moderator approval",
+  "files": [
+    {
+      "minecraft": "26.3",
+      "loader": "fabric",
+      "java": 25,
+      "filename": "seamless-rowing-0.1.0+mc26.3-fabric.jar",
+      "sha256": "53435c45bc873fb2f5f4f0360b9c2cbfbe0f2ea189a98ef93613570920190c77",
+      "sourceCommit": "48be6f81cb7a97c5e7215f19a8ee327c2a6f7c72",
+      "fileId": 9151277,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151277",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 26.3 - Fabric",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Release",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [
+        {
+          "projectId": 306612,
+          "name": "Fabric API",
+          "type": "Required Dependency"
+        },
+        {
+          "projectId": 308702,
+          "name": "Mod Menu",
+          "type": "Optional Dependency"
+        }
+      ],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:16:55.314Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "26.3",
+      "loader": "forge",
+      "java": 25,
+      "filename": "seamless-rowing-0.1.0+mc26.3-forge.jar",
+      "sha256": "9f6592d39fda9f6ff05c8d31abc6088eb206b48ec8e2300c5ce78249b8277ac1",
+      "sourceCommit": "48be6f81cb7a97c5e7215f19a8ee327c2a6f7c72",
+      "fileId": 9151287,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151287",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 26.3 - Forge",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Beta",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:16:55.634Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "26.3",
+      "loader": "neoforge",
+      "java": 25,
+      "filename": "seamless-rowing-0.1.0+mc26.3-neoforge.jar",
+      "sha256": "c045ba66ce5eec9ec86468cf52c4c493e15d3f7478d753dd61d9b2479433f685",
+      "sourceCommit": "48be6f81cb7a97c5e7215f19a8ee327c2a6f7c72",
+      "fileId": 9151296,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151296",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 26.3 - NeoForge",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Beta",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:17:18.361Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "26.2",
+      "loader": "fabric",
+      "java": 25,
+      "filename": "seamless-rowing-0.1.0+mc26.2-fabric.jar",
+      "sha256": "2d93227be38235045acc5a2217dde06faa7c82aa97bdfbafc9e4655892ff5544",
+      "sourceCommit": "dfc6b04e08a22f520098841f548d198bcb930bd5",
+      "fileId": 9151304,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151304",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 26.2 - Fabric",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Release",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [
+        {
+          "projectId": 306612,
+          "name": "Fabric API",
+          "type": "Required Dependency"
+        },
+        {
+          "projectId": 308702,
+          "name": "Mod Menu",
+          "type": "Optional Dependency"
+        }
+      ],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:17:51.422Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "26.2",
+      "loader": "forge",
+      "java": 25,
+      "filename": "seamless-rowing-0.1.0+mc26.2-forge.jar",
+      "sha256": "25018f0b301413c5d8aee0b72635e9a89b0959c2db637b15d423a438b1a64b67",
+      "sourceCommit": "dfc6b04e08a22f520098841f548d198bcb930bd5",
+      "fileId": 9151307,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151307",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 26.2 - Forge",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Release",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:18:21.411Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "26.2",
+      "loader": "neoforge",
+      "java": 25,
+      "filename": "seamless-rowing-0.1.0+mc26.2-neoforge.jar",
+      "sha256": "ecaa15b8df7f4da8c958b27ac9aab7c170098bb0661c1e6f546afee49e95a60b",
+      "sourceCommit": "dfc6b04e08a22f520098841f548d198bcb930bd5",
+      "fileId": 9151311,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151311",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 26.2 - NeoForge",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Release",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:18:22.698Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "1.21.1",
+      "loader": "fabric",
+      "java": 21,
+      "filename": "seamless-rowing-0.1.0+mc1.21.1-fabric.jar",
+      "sha256": "51067f37d8d9f624a7ba68b768cc2c606567dc7f2d465a5b76095345a130cbe6",
+      "sourceCommit": "9a33cacb4e901d88fb66587b1e2c851fe0965119",
+      "fileId": 9151315,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151315",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 1.21.1 - Fabric",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Release",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [
+        {
+          "projectId": 306612,
+          "name": "Fabric API",
+          "type": "Required Dependency"
+        },
+        {
+          "projectId": 308702,
+          "name": "Mod Menu",
+          "type": "Optional Dependency"
+        }
+      ],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:18:23.799Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "1.21.1",
+      "loader": "forge",
+      "java": 21,
+      "filename": "seamless-rowing-0.1.0+mc1.21.1-forge.jar",
+      "sha256": "bc2b455a19061e47475cfb40e2ef9fa982f0267d1cba94eec1bdb94bd8c45e37",
+      "sourceCommit": "9a33cacb4e901d88fb66587b1e2c851fe0965119",
+      "fileId": 9151320,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151320",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 1.21.1 - Forge",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Release",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:18:24.865Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "1.21.1",
+      "loader": "neoforge",
+      "java": 21,
+      "filename": "seamless-rowing-0.1.0+mc1.21.1-neoforge.jar",
+      "sha256": "b6409ee12263f51d63842ea7b1e4798905ecfe24365c33d737df1ccd570a2692",
+      "sourceCommit": "9a33cacb4e901d88fb66587b1e2c851fe0965119",
+      "fileId": 9151333,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151333",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 1.21.1 - NeoForge",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Release",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:18:44.061Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "1.20.1",
+      "loader": "fabric",
+      "java": 17,
+      "filename": "seamless-rowing-0.1.0+mc1.20.1-fabric.jar",
+      "sha256": "43dcc42ab5cf346cfff69034704ecc6ec69c0981449be556c38a46946833f80d",
+      "sourceCommit": "eff1e25d61d508e80c2088a993cc66b7f8f14891",
+      "fileId": 9151351,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151351",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 1.20.1 - Fabric",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Release",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [
+        {
+          "projectId": 306612,
+          "name": "Fabric API",
+          "type": "Required Dependency"
+        },
+        {
+          "projectId": 308702,
+          "name": "Mod Menu",
+          "type": "Optional Dependency"
+        }
+      ],
+      "observedStatus": "Under Review",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:18:45.276Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    },
+    {
+      "minecraft": "1.20.1",
+      "loader": "forge",
+      "java": 17,
+      "filename": "seamless-rowing-0.1.0+mc1.20.1-forge.jar",
+      "sha256": "09be781ee2d9b50aa2121da4c7e26436f039631ec74718bc238524996f7b6687",
+      "sourceCommit": "eff1e25d61d508e80c2088a993cc66b7f8f14891",
+      "fileId": 9151369,
+      "managementUrl": "https://authors.curseforge.com/#/projects/1742062/files/9151369",
+      "displayName": "Seamless Rowing 0.1.0 - Minecraft 1.20.1 - Forge",
+      "environment": [
+        "Client"
+      ],
+      "releaseType": "Release",
+      "publishAutomaticallyAfterApproval": true,
+      "relations": [],
+      "observedStatus": "Processing",
+      "metadataVerifiedInUploadForm": true,
+      "observedAtUtc": "2026-10-12T22:19:12.990Z",
+      "savedMetadataReopenedAndVerified": true,
+      "savedMetadataVerifiedAtUtc": "2026-10-12T22:18:46.648Z",
+      "publicationModeEvidence": "Automatically publish radio checked and reviewed in each submission form. Current edit-file UI does not expose this option."
+    }
+  ],
+  "recordedAtUtc": "2026-10-12T22:20:20.900502+00:00",
+  "gifs": [
+    {
+      "file": "rowing-first-person.gif",
+      "bytes": 583924,
+      "width": 640,
+      "height": 360,
+      "sha256": "716bf04a05e08455395c728e4c47dd54b905553fa1b50ea1b2ef07c853888642",
+      "sourceRun": "263-fabric-shader-av",
+      "gameplaySha256": "53435c45bc873fb2f5f4f0360b9c2cbfbe0f2ea189a98ef93613570920190c77",
+      "url": "https://media.forgecdn.net/attachments/description/null/description_92af4dc4-d4fb-4fe0-9c7f-a90f0af9671c.gif"
+    },
+    {
+      "file": "rowing-third-person-back.gif",
+      "bytes": 795584,
+      "width": 480,
+      "height": 360,
+      "sha256": "34569afded4a8ff576ab79a9a56a2fcf6d4fc139d8cf38860972078c7b2759e5",
+      "sourceRun": "263-fabric-shader-av",
+      "gameplaySha256": "53435c45bc873fb2f5f4f0360b9c2cbfbe0f2ea189a98ef93613570920190c77",
+      "url": "https://media.forgecdn.net/attachments/description/null/description_22a68267-cc8e-4ea8-88d3-a2231e980896.gif"
+    },
+    {
+      "file": "rowing-third-person-front.gif",
+      "bytes": 1518866,
+      "width": 480,
+      "height": 360,
+      "sha256": "7c2b101653acf656b4068a31f4e736b1d27a87f025fd5e5424f6d86b05145911",
+      "sourceRun": "263-fabric-shader-av",
+      "gameplaySha256": "53435c45bc873fb2f5f4f0360b9c2cbfbe0f2ea189a98ef93613570920190c77",
+      "url": "https://media.forgecdn.net/attachments/description/null/description_bfa6863e-61f2-4193-b16b-3ff0aed469b1.gif"
+    }
+  ],
+  "allTransfersCompleted": true,
+  "allElevenSavedMetadataChecksPassed": true,
+  "descriptionImagesVerifiedLoaded": true,
+  "moderationObservedAtUtc": "2026-10-12T22:19:12.990Z",
+  "evidenceDirectory": "C:\\Users\\derko\\Desktop\\minecraft\\seamless-rowing\\qa-artifacts\\curseforge-20261013",
+  "githubPublication": "Not requested or performed"
+}
