@@ -154,10 +154,12 @@ public final class RowingClient {
     }
     public static Matrix4f boatMatrix(Boat boat,float partial) {
         PoseStack stack=new PoseStack(); stack.translate(0,.375f,0);
-        stack.mulPose(Axis.YP.rotationDegrees(180-net.minecraft.util.Mth.rotLerp(partial,boat.yRotO,boat.getYRot())));
+        // Legacy LevelRenderer passes a linearly interpolated yaw to BoatRenderer.
+        stack.mulPose(Axis.YP.rotationDegrees(180-net.minecraft.util.Mth.lerp(partial,boat.yRotO,boat.getYRot())));
         float hurt=boat.getHurtTime()-partial,damage=Math.max(0,boat.getDamage()-partial);
         if (hurt>0) stack.mulPose(Axis.XP.rotationDegrees((float)Math.sin(hurt)*hurt*damage/10*boat.getHurtDir()));
-        if (!boat.isUnderWater() && Math.abs(boat.getBubbleAngle(partial))>1e-5)
+        // This renderer generation applies bubble wobble even while submerged.
+        if (Math.abs(boat.getBubbleAngle(partial))>1e-5)
             stack.mulPose(new Quaternionf().setAngleAxis(boat.getBubbleAngle(partial)*(float)Math.PI/180,1,0,1));
         stack.scale(-1,-1,1); stack.mulPose(Axis.YP.rotationDegrees(90));
         return new Matrix4f(stack.last().pose());

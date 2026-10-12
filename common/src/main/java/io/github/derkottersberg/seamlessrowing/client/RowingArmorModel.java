@@ -39,7 +39,7 @@ public final class RowingArmorModel extends HumanoidModel<AbstractClientPlayer> 
                 if(context.rowingHandsOnly()){head.visible=hat.visible=body.visible=leftLeg.visible=rightLeg.visible=false;}
             }
         }
-        super.renderToBuffer(stack,consumer,light,overlay,color);
+        for(var part:List.of(head,hat,body,leftArm,rightArm,leftLeg,rightLeg)) SurfaceRenderer.render(part,stack,consumer,light,overlay,color);
     }
     private static ArmRigModel.Bone bone(ModelPart arm,RowingPose row,boolean left,Matrix4f transform,boolean hands) {
         if(row.owns(left))return RowingArmLayer.solve(arm,row,left,transform,false);

@@ -26,6 +26,6 @@ public class PlayerRendererMixin {
         var context=RenderContext.current();
         if(context==null||context.rowingPose()==null||!(player.getVehicle() instanceof net.minecraft.world.entity.vehicle.Boat boat))return yaw;
         float weight=Math.max(context.rowingPose().leftWeight(),context.rowingPose().rightWeight());
-        return yaw+net.minecraft.util.Mth.wrapDegrees(net.minecraft.util.Mth.rotLerp(partial,boat.yRotO,boat.getYRot())-yaw)*weight;
+        return yaw+net.minecraft.util.Mth.wrapDegrees(net.minecraft.util.Mth.lerp(partial,boat.yRotO,boat.getYRot())-yaw)*weight;
     }
 }

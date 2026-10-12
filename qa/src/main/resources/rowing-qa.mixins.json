@@ -5,9 +5,13 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "ArmContactProbe",
+    "ArmorDrawProbe",
+    "ArmorSurfaceProbe",
+    "ArmorModelProbe",
     "FrameProbe",
     "SubmittedArmProbe",
     "NativePaddleProbe",
+    "NativeYawProbe",
     "NativeRaftProbe",
     "RenderedPaddleProbe",
     "EmfPaddleTransformProbe",

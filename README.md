@@ -12,9 +12,11 @@ Bind **Open rowing settings** in Options → Controls → Key Binds → Seamless
 
 Unrecognized replacement player/boat renderers and modded boat IDs retain their existing rendering. Custom boat resource geometry disables rowing rather than guessing paddle positions. The 3D Skin Layers fallback uses rigid third-person arms and preserves its first-person rendering. Only version-matched optional APIs are enabled; unsupported versions disable rowing and appear in compatibility status. Fresh Player Extension 1.1 uses its own models outside rowing and the verified vanilla rig during rowing. Other Fresh or custom-player packs require a verified adapter. See [port status](PORTING.md) and the historical [motion preview](docs/MOTION_PREVIEW_ACCEPTANCE.md), [elbow correction](docs/ELBOW_PREVIEW_ACCEPTANCE.md) and [first preview](docs/PREVIEW_ACCEPTANCE.md) reports.
 
+FirstPersonModel temporarily yields its body overlay while Rowing owns first-person arms, then resumes when rowing releases control. Not Enough Animations uses rowing priority 1501 below direct item actions. Punchy yields its boat-hand animation during Rowing's first-person strokes. Exact tested add-on versions and native evidence are recorded in [packaged acceptance](docs/PORT_ACCEPTANCE.md).
+
 ## Build and architecture
 
-Run `gradlew.bat clean check build` with the branch's Java version. Distributions are in each loader's `build/libs` directory. Install the JAR matching both Minecraft and loader. **Never install or distribute the separate QA JAR or optional API stubs as the mod.**
+Run `gradlew.bat clean check build` with Java 25 as the Gradle launcher and the branch's Java compiler toolchain installed. The compiled runtime targets are Java 17, 21 or 25 as shown below. Distributions are in each loader's `build/libs` directory. Install the JAR matching both Minecraft and loader. **Never install or distribute the separate QA JAR or optional API stubs as the mod.**
 
 `common` owns eligibility, paddle geometry, interpolation, fixed-length IK, immutable pose snapshots, settings and narrow rendering hooks. Explicit Fabric, Forge and NeoForge services supply lifecycle, keys, resource reload and menus. Their shared `loader-adapters` source directory contains optional integrations and is excluded from `common`. Architectury/Loom are build tools only. There is no new networking protocol, server entrypoint or library shading. The 26.3 deferred renderer receives captured visibility and pose data rather than advancing animation during rendering.
 

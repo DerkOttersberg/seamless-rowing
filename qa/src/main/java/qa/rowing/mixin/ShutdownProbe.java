@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ShutdownProbe {
     @Inject(method="stop",at=@At("HEAD"))
     private void anatomy(CallbackInfo ci) {
+        qa.rowing.ArmorSubmission.write((Minecraft)(Object)this);
         qa.rowing.HeadCompileProbe.write((Minecraft)(Object)this);
         qa.rowing.LocalHeadDraws.write((Minecraft)(Object)this);
         qa.rowing.SurfaceSubmission.write((Minecraft)(Object)this);

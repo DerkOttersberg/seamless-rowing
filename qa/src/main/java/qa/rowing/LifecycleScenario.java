@@ -20,6 +20,7 @@ public final class LifecycleScenario {
         if(tick==72) {
             var boat=(Boat)mc.player.getVehicle();boat.setHurtTime(9);boat.setDamage(5);boat.setHurtDir(1);
         }
+        if(tick>=80&&tick<=88){var boat=(Boat)mc.player.getVehicle();boat.yRotO=179;boat.setYRot(-179);}
         if(tick%2==0&&tick>66&&tick<86) Screenshot.grab(mc.gameDirectory,"wobble-"+tick+".png",mc.getMainRenderTarget(),m->{});
         if(tick==110) {
             var boat=(Boat)mc.player.getVehicle();
@@ -27,8 +28,8 @@ public final class LifecycleScenario {
             check(RowingClient.capture(mc.player,1,false)==null,"Stopped boat retained pose");assertions++;
         }
         if(tick==112) {
-            boolean pass=FrameContact.samples()>10&&FrameContact.maximum()<=1;
-            try {Files.writeString(mc.gameDirectory.toPath().resolve("rowing-lifecycle.json"),"{\"pass\":"+pass+",\"assertions\":"+assertions+",\"nativeSamples\":"+FrameContact.samples()+",\"maximumErrorPixels\":"+FrameContact.maximum()+"}");}
+            boolean pass=FrameContact.samples()>10&&FrameContact.maximum()<=1&&NativeYaw.frames()>0&&NativeYaw.maximumDifference()<.001f;
+            try {Files.writeString(mc.gameDirectory.toPath().resolve("rowing-lifecycle.json"),"{\"pass\":"+pass+",\"assertions\":"+assertions+",\"nativeSamples\":"+FrameContact.samples()+",\"nativeYawBoundaryFrames\":"+NativeYaw.frames()+",\"nativeYawMaximumDifferenceDegrees\":"+NativeYaw.maximumDifference()+",\"maximumErrorPixels\":"+FrameContact.maximum()+"}");}
             catch(Exception failure){throw new RuntimeException(failure);}
             System.out.println("ROWING_LIFECYCLE_COMPLETE pass="+pass);mc.stop();
         }
